@@ -1,0 +1,5 @@
+import { ImageBackground, Text, View } from 'react-native'
+import { colors } from '../theme/colors'
+import { typography } from '../theme/typography'
+
+export function BookCover({ title, category, seed, small = false }: { title: string; category?: string; seed: string | number; small?: boolean }) { return <ImageBackground source={{ uri: `https://picsum.photos/seed/mobile-book-${seed}/600/820` }} imageStyle={{ borderRadius: 14 }} style={{ backgroundColor: colors.ink, borderRadius: 14, height: small ? 150 : 246, overflow: 'hidden', width: small ? 108 : 176 }}><View style={{ backgroundColor: 'rgba(18,51,45,.46)', flex: 1, justifyContent: 'flex-end', padding: 13 }}><Text style={{ color: colors.terracottaLight, fontFamily: typography.mono, fontSize: 9, letterSpacing: 1, textTransform: 'uppercase' }}>{category || '云阁藏书'}</Text><Text numberOfLines={2} style={{ color: colors.white, fontFamily: typography.display, fontSize: small ? 14 : 20, lineHeight: small ? 17 : 23, marginTop: 7 }}>{title}</Text></View></ImageBackground> }
