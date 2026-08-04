@@ -1,0 +1,63 @@
+name: Mobile Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Android and iOS release
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate project
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test -- --run
+          npx expo-doctor
+
+      - name: Link or create EAS project
+        run: npx eas-cli project:init --account Kylinlixd --non-interactive
+
+      - name: Build Android and iOS
+        run: npx eas-cli build --platform all --profile production --non-interactive --wait
+
+      - name: Download Android artifact
+        run: |
+          mkdir -p artifacts/android
+          npx eas-cli build:download --platform android --non-interactive
+          find . -maxdepth 1 -type f \( -name '*.apk' -o -name '*.aab' \) -exec mv {} artifacts/android/ \;
+
+      - name: Download iOS artifact
+        run: |
+          mkdir -p artifacts/ios
+          npx eas-cli build:download --platform ios --non-interactive
+          find . -maxdepth 1 -type f -name '*.ipa' -exec mv {} artifacts/ios/ \;
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            artifacts/android/*
+            artifacts/ios/*

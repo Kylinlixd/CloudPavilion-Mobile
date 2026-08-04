@@ -2,16 +2,19 @@
   "expo": {
     "name": "云阁 CloudPavilion",
     "slug": "cloudpavilion-mobile",
-    "version": "0.1.0",
+    "version": "1.0.0",
+    "owner": "Kylinlixd",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "scheme": "cloudpavilion",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kylinlixd.cloudpavilion"
+      "bundleIdentifier": "com.kylinlixd.cloudpavilion",
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.kylinlixd.cloudpavilion",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#12332d"
       }

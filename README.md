@@ -36,7 +36,9 @@ EXPO_PUBLIC_API_BASE_URL=http://192.168.1.20:8000/api/v1
 
 ## Android / iOS 构建
 
-本项目使用同一份 TypeScript 源码生成两个平台的应用。需要先登录 Expo/EAS 并替换 `app.json` 中的 `extra.eas.projectId`：
+本项目使用同一份 TypeScript 源码生成两个平台的应用。当前版本为 `1.0.0`，Android `versionCode=1`，iOS `buildNumber=1`。
+
+本地构建需要先登录 Expo/EAS，并初始化项目：
 
 ```bash
 npx eas login
@@ -50,6 +52,17 @@ npx eas build --platform ios --profile preview
 ```bash
 npx eas build --platform all --profile production
 ```
+
+## GitHub Release
+
+仓库包含 `.github/workflows/mobile-release.yml`。发布新版本时创建版本标签：
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions 会使用 `EXPO_TOKEN` 调用 EAS，同时构建 Android 和 iOS，并把产物上传到对应 GitHub Release。仓库管理员需要在 GitHub Settings → Secrets and variables → Actions 中添加 `EXPO_TOKEN`；EAS 账号还必须有 Android/iOS 签名凭据权限。
 
 ## 验证
 
