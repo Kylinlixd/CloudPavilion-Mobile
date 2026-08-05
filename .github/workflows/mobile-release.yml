@@ -48,19 +48,18 @@ jobs:
       - name: Build Android production
         run: |
           npx eas-cli build --platform android --profile production --non-interactive --wait --json > android-build.json
-          jq -er 'if type == "array" then .[0].id else .id end' android-build.json > android-build-id.txt
+          jq -er 'if type == "array" then .[0].artifacts.applicationArchiveUrl else .artifacts.applicationArchiveUrl end' android-build.json > android-artifact-url.txt
 
       - name: Build iOS Simulator
         run: |
           npx eas-cli build --platform ios --profile simulator --non-interactive --wait --json > ios-build.json
-          jq -er 'if type == "array" then .[0].id else .id end' ios-build.json > ios-build-id.txt
+          jq -er 'if type == "array" then .[0].artifacts.applicationArchiveUrl else .artifacts.applicationArchiveUrl end' ios-build.json > ios-artifact-url.txt
 
       - name: Download Android artifact
         run: |
           mkdir -p artifacts/android
-          npx eas-cli build:download --build-id "$(cat android-build-id.txt)" --non-interactive
-          find . -maxdepth 1 -type f \( -name '*.apk' -o -name '*.aab' \) -exec mv {} artifacts/android/ \;
-          if ! find artifacts/android -type f -print -quit | grep -q .; then
+          curl --fail --location --retry 3 "$(cat android-artifact-url.txt)" -o "artifacts/android/CloudPavilion-${RELEASE_TAG}-android.aab"
+          if [ ! -s "artifacts/android/CloudPavilion-${RELEASE_TAG}-android.aab" ]; then
             echo "No Android artifact was downloaded"
             exit 1
           fi
@@ -68,9 +67,8 @@ jobs:
       - name: Download iOS artifact
         run: |
           mkdir -p artifacts/ios
-          npx eas-cli build:download --build-id "$(cat ios-build-id.txt)" --non-interactive
-          find . -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.ipa' \) -exec mv {} artifacts/ios/ \;
-          if ! find artifacts/ios -type f -print -quit | grep -q .; then
+          curl --fail --location --retry 3 "$(cat ios-artifact-url.txt)" -o "artifacts/ios/CloudPavilion-${RELEASE_TAG}-ios-simulator.tar.gz"
+          if [ ! -s "artifacts/ios/CloudPavilion-${RELEASE_TAG}-ios-simulator.tar.gz" ]; then
             echo "No iOS Simulator artifact was downloaded"
             exit 1
           fi
