@@ -45,20 +45,31 @@ jobs:
       - name: Link or create EAS project
         run: npx eas-cli project:init --account kylinlees-team --non-interactive
 
-      - name: Build Android and iOS
-        run: npx eas-cli build --platform all --profile production --non-interactive --wait
+      - name: Build Android production
+        run: npx eas-cli build --platform android --profile production --non-interactive --wait
+
+      - name: Build iOS Simulator
+        run: npx eas-cli build --platform ios --profile simulator --non-interactive --wait
 
       - name: Download Android artifact
         run: |
           mkdir -p artifacts/android
           npx eas-cli build:download --platform android --non-interactive
           find . -maxdepth 1 -type f \( -name '*.apk' -o -name '*.aab' \) -exec mv {} artifacts/android/ \;
+          if ! find artifacts/android -type f -print -quit | grep -q .; then
+            echo "No Android artifact was downloaded"
+            exit 1
+          fi
 
       - name: Download iOS artifact
         run: |
           mkdir -p artifacts/ios
           npx eas-cli build:download --platform ios --non-interactive
-          find . -maxdepth 1 -type f -name '*.ipa' -exec mv {} artifacts/ios/ \;
+          find . -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.ipa' \) -exec mv {} artifacts/ios/ \;
+          if ! find artifacts/ios -type f -print -quit | grep -q .; then
+            echo "No iOS Simulator artifact was downloaded"
+            exit 1
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

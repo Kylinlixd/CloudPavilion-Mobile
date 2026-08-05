@@ -45,13 +45,17 @@ npx eas login
 npx eas init
 npx eas build --platform android --profile preview
 npx eas build --platform ios --profile preview
+npx eas build --platform ios --profile simulator
 ```
 
 生产发布：
 
 ```bash
-npx eas build --platform all --profile production
+npx eas build --platform android --profile production
+npx eas build --platform ios --profile simulator
 ```
+
+Android 生产构建用于正式发布。iOS `simulator` 构建无需付费 Apple Developer 账号，只能在 macOS 的 Xcode Simulator 中运行，不能安装到真实 iPhone，也不能提交到 App Store；真实 iPhone IPA 需要 Apple Developer 账号和签名凭据。
 
 ## GitHub Release
 
@@ -62,7 +66,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-GitHub Actions 会使用 `EXPO_TOKEN` 调用 EAS，同时构建 Android 和 iOS，并把产物上传到对应 GitHub Release。仓库管理员需要在 GitHub Settings → Secrets and variables → Actions 中添加 `EXPO_TOKEN`；EAS 账号还必须有 Android/iOS 签名凭据权限。
+GitHub Actions 会使用 `EXPO_TOKEN` 调用 EAS，分别构建 Android production 和 iOS Simulator，并把产物上传到对应 GitHub Release。仓库管理员需要在 GitHub Settings → Secrets and variables → Actions 中添加 `EXPO_TOKEN`；EAS 账号需要有 Android 构建凭据权限，iOS Simulator 不需要 Apple 签名凭据。
 
 ## 验证
 
