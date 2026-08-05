@@ -43,7 +43,7 @@ jobs:
           npx expo-doctor
 
       - name: Link or create EAS project
-        run: npx eas-cli project:init --account Kylinlixd --non-interactive
+        run: npx eas-cli project:init --account kylinlees-team --non-interactive
 
       - name: Build Android and iOS
         run: npx eas-cli build --platform all --profile production --non-interactive --wait
