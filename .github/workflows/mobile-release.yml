@@ -46,15 +46,19 @@ jobs:
         run: npx eas-cli project:init --account kylinlees-team --non-interactive
 
       - name: Build Android production
-        run: npx eas-cli build --platform android --profile production --non-interactive --wait
+        run: |
+          npx eas-cli build --platform android --profile production --non-interactive --wait --json > android-build.json
+          jq -er 'if type == "array" then .[0].id else .id end' android-build.json > android-build-id.txt
 
       - name: Build iOS Simulator
-        run: npx eas-cli build --platform ios --profile simulator --non-interactive --wait
+        run: |
+          npx eas-cli build --platform ios --profile simulator --non-interactive --wait --json > ios-build.json
+          jq -er 'if type == "array" then .[0].id else .id end' ios-build.json > ios-build-id.txt
 
       - name: Download Android artifact
         run: |
           mkdir -p artifacts/android
-          npx eas-cli build:download --platform android --non-interactive
+          npx eas-cli build:download --build-id "$(cat android-build-id.txt)" --non-interactive
           find . -maxdepth 1 -type f \( -name '*.apk' -o -name '*.aab' \) -exec mv {} artifacts/android/ \;
           if ! find artifacts/android -type f -print -quit | grep -q .; then
             echo "No Android artifact was downloaded"
@@ -64,7 +68,7 @@ jobs:
       - name: Download iOS artifact
         run: |
           mkdir -p artifacts/ios
-          npx eas-cli build:download --platform ios --non-interactive
+          npx eas-cli build:download --build-id "$(cat ios-build-id.txt)" --non-interactive
           find . -maxdepth 1 -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.ipa' \) -exec mv {} artifacts/ios/ \;
           if ! find artifacts/ios -type f -print -quit | grep -q .; then
             echo "No iOS Simulator artifact was downloaded"
