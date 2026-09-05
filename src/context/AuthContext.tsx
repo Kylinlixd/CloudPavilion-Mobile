@@ -1,9 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import { apiClient } from '../lib/api'
-import { clearSession, getAccessToken, setSession } from '../lib/storage'
+import { loginAccount, registerAccount } from '../lib/auth'
+import { clearSession, getAccessToken } from '../lib/storage'
 
-type AuthValue = { isAuthenticated: boolean; hydrating: boolean; login: (username: string, password: string) => Promise<void>; logout: () => Promise<void> }
+type AuthValue = {
+  isAuthenticated: boolean
+  hydrating: boolean
+  login: (username: string, password: string) => Promise<void>
+  register: (username: string, password: string, passwordConfirm: string) => Promise<void>
+  logout: () => Promise<void>
+}
 const AuthContext = createContext<AuthValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -11,9 +18,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [hydrating, setHydrating] = useState(true)
   useEffect(() => { void getAccessToken().then(setAccess).finally(() => setHydrating(false)) }, [])
   const login = useCallback(async (username: string, password: string) => {
-    const result = await apiClient.post<{ access: string; refresh: string }>('/auth/token/', { username, password })
-    await setSession(result.access, result.refresh)
-    setAccess(result.access)
+    setAccess(await loginAccount(username, password))
+  }, [])
+  const register = useCallback(async (username: string, password: string, passwordConfirm: string) => {
+    setAccess(await registerAccount(username, password, passwordConfirm))
   }, [])
   const logout = useCallback(async () => {
     try {
@@ -23,7 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccess(null)
     }
   }, [])
-  const value = useMemo(() => ({ isAuthenticated: Boolean(access), hydrating, login, logout }), [access, hydrating, login, logout])
+  const value = useMemo(
+    () => ({ isAuthenticated: Boolean(access), hydrating, login, register, logout }),
+    [access, hydrating, login, register, logout],
+  )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
