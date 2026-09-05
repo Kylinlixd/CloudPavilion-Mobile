@@ -7,6 +7,7 @@ import { colors } from '../theme/colors'
 import type { MainTabParamList, RootStackParamList } from './types'
 import { LoadingState } from '../components/LoadingState'
 import { LoginScreen } from '../screens/LoginScreen'
+import { RegisterScreen } from '../screens/RegisterScreen'
 import { HomeScreen } from '../screens/HomeScreen'
 import { CatalogScreen } from '../screens/CatalogScreen'
 import { LoansScreen } from '../screens/LoansScreen'
@@ -27,5 +28,5 @@ function MainTabs() {
 export function RootNavigator() {
   const { isAuthenticated, hydrating } = useAuth()
   if (hydrating) return <LoadingState label="正在打开书房" />
-  return <NavigationContainer theme={navTheme}><Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>{!isAuthenticated ? <Root.Screen name="Login" component={LoginScreen} /> : <><Root.Screen name="Main" component={MainTabs} /><Root.Screen name="BookDetail" component={BookDetailScreen} /><Root.Screen name="Reservations" component={ReservationsScreen} /><Root.Screen name="Reports" component={ReportsScreen} /><Root.Screen name="Settings" component={SettingsScreen} /></>}</Root.Navigator></NavigationContainer>
+  return <NavigationContainer theme={navTheme}><Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>{!isAuthenticated ? <><Root.Screen name="Login" component={LoginScreen} /><Root.Screen name="Register" component={RegisterScreen} /></> : <><Root.Screen name="Main" component={MainTabs} /><Root.Screen name="BookDetail" component={BookDetailScreen} /><Root.Screen name="Reservations" component={ReservationsScreen} /><Root.Screen name="Reports" component={ReportsScreen} /><Root.Screen name="Settings" component={SettingsScreen} /></>}</Root.Navigator></NavigationContainer>
 }
