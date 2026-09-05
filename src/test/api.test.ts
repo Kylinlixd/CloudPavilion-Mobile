@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as SecureStore from 'expo-secure-store'
 
-import { apiClient } from '../lib/api'
+import { API_BASE_URL, apiClient } from '../lib/api'
 
 describe('mobile api client', () => {
   const fetchMock = vi.fn()
@@ -12,6 +12,10 @@ describe('mobile api client', () => {
     vi.mocked(SecureStore.getItemAsync).mockReset()
     vi.mocked(SecureStore.setItemAsync).mockReset()
     vi.mocked(SecureStore.deleteItemAsync).mockReset()
+  })
+
+  it('defaults release builds to the production API', () => {
+    expect(API_BASE_URL).toBe('https://leexd.top/cloudpavilion/api/v1')
   })
 
   it('adds JWT and family headers to protected requests', async () => {
