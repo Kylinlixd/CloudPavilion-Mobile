@@ -1,5 +1,5 @@
 import { apiClient } from './api'
-import { setSession } from './storage'
+import { getRefreshToken, setSession } from './storage'
 
 type AuthResponse = {
   user?: { id: number; username: string }
@@ -22,4 +22,9 @@ export async function registerAccount(username: string, password: string, passwo
     password,
     password_confirm: passwordConfirm,
   }))
+}
+
+export async function logoutAccount() {
+  const refresh = await getRefreshToken()
+  if (refresh) await apiClient.post('/auth/logout/', { refresh })
 }

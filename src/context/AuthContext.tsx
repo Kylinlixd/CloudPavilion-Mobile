@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-import { apiClient } from '../lib/api'
-import { loginAccount, registerAccount } from '../lib/auth'
+import { loginAccount, logoutAccount, registerAccount } from '../lib/auth'
 import { clearSession, getAccessToken } from '../lib/storage'
 
 type AuthValue = {
@@ -25,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
   const logout = useCallback(async () => {
     try {
-      await apiClient.post('/auth/logout/')
+      await logoutAccount()
     } finally {
       await clearSession()
       setAccess(null)
