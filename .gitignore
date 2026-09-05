@@ -5,6 +5,7 @@ dist-ios/
 dist-android-final/
 dist-ios-final/
 coverage/
+.build/
 .env
 .env.local
 *.log
