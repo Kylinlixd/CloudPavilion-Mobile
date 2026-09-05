@@ -35,11 +35,12 @@ describe('mobile api client', () => {
     }[key] || null))
     fetchMock
       .mockResolvedValueOnce(new Response(JSON.stringify({ detail: '过期' }), { status: 401 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ access: 'fresh-token' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access: 'fresh-token', refresh: 'fresh-refresh' }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }))
 
     await expect(apiClient.get<{ ok: boolean }>('/reports/dashboard/')).resolves.toEqual({ ok: true })
     expect(SecureStore.setItemAsync).toHaveBeenCalledWith('cloudpavilion.access', 'fresh-token')
+    expect(SecureStore.setItemAsync).toHaveBeenCalledWith('cloudpavilion.refresh', 'fresh-refresh')
     expect(fetchMock).toHaveBeenCalledTimes(3)
   })
 

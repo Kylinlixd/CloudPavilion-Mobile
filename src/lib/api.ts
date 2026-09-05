@@ -1,4 +1,4 @@
-import { getAccessToken, getFamilyId, getRefreshToken, setAccessToken } from './storage'
+import { getAccessToken, getFamilyId, getRefreshToken, setAccessToken, setSession } from './storage'
 
 export const API_BASE_URL = (process.env.EXPO_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000/api/v1').replace(/\/$/, '')
 
@@ -33,8 +33,9 @@ async function refreshAccessToken() {
     body: JSON.stringify({ refresh }),
   })
   if (!response.ok) return false
-  const result = (await response.json()) as { access: string }
-  await setAccessToken(result.access)
+  const result = (await response.json()) as { access: string; refresh?: string }
+  if (result.refresh) await setSession(result.access, result.refresh)
+  else await setAccessToken(result.access)
   return true
 }
 
