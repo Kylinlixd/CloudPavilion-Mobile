@@ -27,10 +27,12 @@ Backend repository `/Users/leexd/CloudPavilion`:
 Mobile repository `/Users/leexd/CloudPavilion-Mobile`:
 
 - Modify `package.json`, `package-lock.json`: add the Expo-compatible camera package.
+- Create `assets/cloudpavilion-logo.png`: bundled source logo copied from the confirmed backend brand asset.
 - Modify `app.json`, `ios/CloudPavilion/Info.plist`, `ios/Podfile.lock`: camera plugin, iOS permission string, native pod resolution.
 - Create `src/lib/books.ts`: scan validation, intake types, lookup and save calls.
 - Create `src/test/books.test.ts`: scan and request contract tests.
 - Create `src/screens/AddBookScreen.tsx`: camera/manual modes and editable form.
+- Modify `src/screens/LoginScreen.tsx`, `src/screens/RegisterScreen.tsx`: render the bundled Logo.
 - Modify `src/navigation/types.ts`, `src/navigation/RootNavigator.tsx`: add the intake route.
 - Modify `src/screens/CatalogScreen.tsx`: mobile add entry point and focus refresh.
 - Modify `src/components/BookCover.tsx`, `src/screens/BookDetailScreen.tsx`, `src/lib/types.ts`: render external cover URLs.
@@ -534,6 +536,61 @@ git add package.json package-lock.json app.json ios/CloudPavilion/Info.plist ios
 git commit -m "feat: enable ISBN camera scanning"
 ```
 
+### Task 6A: Bundle the confirmed Logo throughout the app
+
+**Files:**
+- Create: `/Users/leexd/CloudPavilion-Mobile/assets/cloudpavilion-logo.png`
+- Modify: `/Users/leexd/CloudPavilion-Mobile/app.json`
+- Modify: `/Users/leexd/CloudPavilion-Mobile/src/screens/LoginScreen.tsx`
+- Modify: `/Users/leexd/CloudPavilion-Mobile/src/screens/RegisterScreen.tsx`
+
+- [ ] **Step 1: Copy and verify the immutable source asset**
+
+Copy `/Users/leexd/CloudPavilion/core/static/core/images/cloudpavilion-logo.png` to `assets/cloudpavilion-logo.png`. Verify both files have the same SHA-256 digest and the destination is a 1254×1254 RGB PNG without alpha.
+
+- [ ] **Step 2: Configure platform icon and splash assets**
+
+Add to the Expo root configuration:
+
+```json
+"icon": "./assets/cloudpavilion-logo.png",
+"splash": {
+  "image": "./assets/cloudpavilion-logo.png",
+  "resizeMode": "contain",
+  "backgroundColor": "#72c8ef"
+}
+```
+
+Set `ios.icon`, `android.icon`, and `android.adaptiveIcon.foregroundImage` to the same local path while retaining Android background `#12332d`.
+
+- [ ] **Step 3: Render the bundled image on authentication screens**
+
+Import `Image` from React Native and render:
+
+```tsx
+<Image
+  accessibilityLabel="云阁 Logo"
+  resizeMode="contain"
+  source={require('../../assets/cloudpavilion-logo.png')}
+  style={{ height: 88, width: 88 }}
+/>
+```
+
+Place it at the top of the dark brand card on both login and registration screens without removing the existing product name and statement.
+
+- [ ] **Step 4: Validate Expo asset resolution and commit**
+
+```bash
+npx expo config --type public >/tmp/cloudpavilion-expo-config.json
+rg 'cloudpavilion-logo.png' /tmp/cloudpavilion-expo-config.json
+npm run typecheck
+npm run lint
+git add assets/cloudpavilion-logo.png app.json src/screens/LoginScreen.tsx src/screens/RegisterScreen.tsx
+git commit -m "feat: bundle CloudPavilion logo"
+```
+
+Expected: config output references the local Logo and both code checks exit 0.
+
 ### Task 7: Build the mobile book intake API module
 
 **Files:**
@@ -797,6 +854,9 @@ xcodebuild -workspace ios/CloudPavilion.xcworkspace \
 
 codesign --verify --deep --strict --verbose=2 \
   .build/ios-signed/Build/Products/Release-iphoneos/CloudPavilion.app
+
+find .build/ios-signed/Build/Products/Release-iphoneos/CloudPavilion.app \
+  -iname '*cloudpavilion-logo*' -o -iname 'AppIcon*'
 
 xcrun devicectl device install app \
   --device 029B5201-EC1D-5BEE-89DC-64888EF543EF \
