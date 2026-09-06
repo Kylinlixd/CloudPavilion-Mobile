@@ -4,6 +4,7 @@ import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'ex
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 import { ActionButton } from '../components/ActionButton'
+import { Screen } from '../components/Screen'
 import { useFamily } from '../context/FamilyContext'
 import { ApiError } from '../lib/api'
 import {
@@ -141,14 +142,14 @@ export function AddBookScreen({ navigation }: Props) {
   }), [draft, navigation])
 
   if (!familyId) {
-    return <View style={{ backgroundColor: colors.paper, flex: 1, justifyContent: 'center', padding: spacing.xl }}>
+    return <Screen><View style={{ backgroundColor: colors.paper, flex: 1, justifyContent: 'center', padding: spacing.xl }}>
       <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 32 }}>先选择一个家庭。</Text>
       <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 14, lineHeight: 21, marginTop: 12 }}>书籍需要放进一个家庭书房，设置完成后再回来添加。</Text>
       <View style={{ marginTop: spacing.xl }}><ActionButton onPress={() => navigation.navigate('Settings')}>打开设置</ActionButton></View>
-    </View>
+    </View></Screen>
   }
 
-  return <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: 120 }} keyboardShouldPersistTaps="handled" style={{ backgroundColor: colors.paper }}>
+  return <Screen><ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: 120 }} keyboardShouldPersistTaps="handled" style={{ backgroundColor: colors.paper }}>
     <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()}>
       <Text style={{ color: colors.terracotta, fontFamily: typography.body, fontSize: 14 }}>← 返回藏书</Text>
     </TouchableOpacity>
@@ -191,5 +192,5 @@ export function AddBookScreen({ navigation }: Props) {
       <View style={{ marginTop: spacing.sm }}><ActionButton disabled={submitting} onPress={() => void guardedSave()}>保存到家庭书房</ActionButton></View>
       <ActionButton onPress={() => { setMode('scan'); setMessage(''); setScanning(true) }} quiet>返回扫码</ActionButton>
     </View>}
-  </ScrollView>
+  </ScrollView></Screen>
 }
