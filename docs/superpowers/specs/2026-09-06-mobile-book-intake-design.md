@@ -44,7 +44,7 @@ Authorization: Bearer <access>
 X-Family-ID: <family-id>
 ```
 
-后端规范化并校验 ISBN，先查询本地 `Book`；本地未命中时查询 Google Books，仍未命中再查询 Open Library。结果转换为 `title`、`author`、`isbn`、`publisher`、`publish_date`、`category`、`description`、`cover` 和 `source` 字段，不把第三方响应直接暴露给手机端。只有完整的 `YYYY-MM-DD` 才写入 `publish_date`，仅有年份或年月时返回空值。成功返回 `200`，合法但未命中返回 `404`，格式无效返回 `400`。
+后端规范化并校验 ISBN，先查询本地 `Book`；本地未命中时查询 Google Books，仍未命中再查询 Open Library。结果转换为 `title`、`author`、`isbn`、`publisher`、`publish_date`、`category`、`description`、`cover_url` 和 `source` 字段，不把第三方响应直接暴露给手机端。只有完整的 `YYYY-MM-DD` 才写入 `publish_date`，仅有年份或年月时返回空值。成功返回 `200`，合法但未命中返回 `404`，格式无效返回 `400`。
 
 每个外部提供方的连接与读取总超时为 3 秒。成功结果缓存 24 小时，“未命中”结果缓存 10 分钟；第三方超时或异常返回 `503`，但移动端仍可继续手动填写。
 
@@ -72,7 +72,7 @@ X-Family-ID: <family-id>
 - 主数据源：Google Books `volumes?q=isbn:<isbn>`。
 - 回退数据源：Open Library ISBN/Books API。
 - 外部 HTTP 请求只由后端发起；可选的 `GOOGLE_BOOKS_API_KEY` 只保存在生产环境变量中。移动端不保存第三方 API 密钥，也不依赖第三方响应格式。
-- 第三方封面 URL 转换为 HTTPS 后保存。
+- `Book` 新增 `cover_url` 保存转换为 HTTPS 的第三方封面地址，原有 `cover` 上传字段保持兼容。移动端优先显示 `cover_url`，没有时使用原上传封面或占位封面。
 
 ## 权限与安全
 
