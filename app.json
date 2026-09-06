@@ -7,19 +7,40 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "scheme": "cloudpavilion",
+    "icon": "./assets/cloudpavilion-logo.png",
     "ios": {
       "supportsTablet": true,
+      "icon": "./assets/cloudpavilion-logo.png",
       "bundleIdentifier": "com.kylinlixd.cloudpavilion",
       "buildNumber": "1"
     },
     "android": {
       "package": "com.kylinlixd.cloudpavilion",
       "versionCode": 1,
+      "icon": "./assets/cloudpavilion-logo.png",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/cloudpavilion-logo.png",
         "backgroundColor": "#12332d"
       }
     },
-    "plugins": ["expo-secure-store"],
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "允许云阁扫描书籍 ISBN 条码。"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/cloudpavilion-logo.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#72c8ef"
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "ae94bff8-e84f-445c-a26d-01ccaf54edeb"
