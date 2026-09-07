@@ -12,7 +12,7 @@
       "supportsTablet": true,
       "icon": "./assets/cloudpavilion-logo.png",
       "bundleIdentifier": "com.kylinlixd.cloudpavilion",
-      "buildNumber": "1"
+      "buildNumber": "2"
     },
     "android": {
       "package": "com.kylinlixd.cloudpavilion",
@@ -25,10 +25,12 @@
     },
     "plugins": [
       "expo-secure-store",
+      ["expo-image-picker", {"photosPermission": "允许云阁选择书摘图片。", "cameraPermission": "允许云阁拍摄书籍封面或版权页，识别书目信息。", "microphonePermission": false}],
       [
         "expo-camera",
         {
-          "cameraPermission": "允许云阁扫描书籍 ISBN 条码。"
+          "cameraPermission": "允许云阁扫描 ISBN 或拍摄书籍识别信息。",
+          "recordAudioAndroid": false
         }
       ],
       [

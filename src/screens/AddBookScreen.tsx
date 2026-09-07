@@ -3,6 +3,7 @@ import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'reac
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 
+import { MetadataPicker } from '../components/MetadataPicker'
 import { ActionButton } from '../components/ActionButton'
 import { useFamily } from '../context/FamilyContext'
 import { ApiError } from '../lib/api'
@@ -102,7 +103,7 @@ export function AddBookScreen({ navigation }: Props) {
     setLookupPending(true)
     try {
       const { source, ...metadata } = await lookupBookByIsbn(isbn)
-      setDraft((current) => ({ ...current, ...metadata, isbn }))
+      setDraft((current) => ({ ...current, ...metadata, publish_date: metadata.publish_date || '', isbn }))
       setMessage(source === 'local' ? '已找到云阁中的书目，可直接新增副本。' : '已自动补全书目信息，请确认后保存。')
       setMode('manual')
     } catch (caught) {
@@ -154,6 +155,7 @@ export function AddBookScreen({ navigation }: Props) {
     </TouchableOpacity>
     <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 36, letterSpacing: -1.2, marginTop: spacing.lg }}>添加一本书</Text>
     <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 13, lineHeight: 20, marginTop: 8 }}>扫描 ISBN 自动补全，或者直接手动录入。</Text>
+    <MetadataPicker onCameraOpening={() => { setMode('manual'); setScanning(false) }} onChoose={({ source: _source, ...metadata }) => { setDraft((current) => ({ ...current, ...metadata, publish_date: metadata.publish_date || '' })); setMode('manual'); setScanning(false); setMessage('请确认识别或搜索结果后保存。') }} />
 
     <View style={{ backgroundColor: colors.paperBright, borderRadius: 12, flexDirection: 'row', gap: 6, marginTop: spacing.xl, padding: 5 }}>
       {(['scan', 'manual'] as const).map((value) => <TouchableOpacity key={value} onPress={() => { setMode(value); setMessage(''); if (value === 'scan') setScanning(true) }} style={{ alignItems: 'center', backgroundColor: mode === value ? colors.ink : 'transparent', borderRadius: 9, flex: 1, paddingVertical: 12 }}>

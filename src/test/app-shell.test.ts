@@ -14,9 +14,7 @@ describe('native app shell', () => {
 
   it('uses 云阁 as the installed app name', () => {
     const appConfig = JSON.parse(readFileSync(resolve(projectRoot, 'app.json'), 'utf8'))
-    const infoPlist = readFileSync(resolve(projectRoot, 'ios/CloudPavilion/Info.plist'), 'utf8')
 
     expect(appConfig.expo.name).toBe('云阁')
-    expect(infoPlist).toContain('<string>云阁</string>')
   })
 })

@@ -52,4 +52,14 @@ describe('mobile api client', () => {
     fetchMock.mockResolvedValue(new Response(JSON.stringify({ detail: '没有权限' }), { status: 403 }))
     await expect(apiClient.get('/audit-logs/')).rejects.toMatchObject({ status: 403, message: '没有权限' })
   })
+
+  it('sends multipart bodies without forcing a JSON content type', async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ id: 3 }), { status: 201 }))
+    const body = new FormData()
+    body.append('content', '书摘')
+    await expect(apiClient.upload('/excerpts/', body)).resolves.toEqual({ id: 3 })
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.body).toBe(body)
+    expect(options.headers.has('Content-Type')).toBe(false)
+  })
 })
