@@ -16,7 +16,7 @@ export type BookDraft = {
 }
 
 export type BookLookup = Omit<BookDraft, 'barcode' | 'notes'> & {
-  source: 'local' | 'google' | 'openlibrary'
+  source: 'local' | 'google' | 'openlibrary' | 'douban'
 }
 
 export type BookIntakeResult = {
