@@ -60,14 +60,14 @@ export function BookReadingPanel({ bookId, title }: { bookId: number; title: str
   return <View style={{ marginTop: 28, gap: 16 }}>
     <Text style={{ color: colors.ink, fontSize: 26 }}>电子书</Text>
     {ebooks.map((item) => <ActionButton key={item.id} onPress={() => navigation.navigate('Reader', { ebookId: item.id, title: item.name })} quiet>{item.name} · 继续阅读 →</ActionButton>)}
-    <ActionButton disabled={busy} onPress={() => void importBook()} quiet>导入 EPUB / PDF / TXT</ActionButton>
+    <ActionButton disabled={busy} loading={busy} onPress={() => void importBook()} quiet>导入 EPUB / PDF / TXT</ActionButton>
     <Text style={{ color: colors.ink, fontSize: 26, marginTop: 12 }}>书摘分享</Text>
     <Text style={{ color: colors.muted }}>把喜欢的文字或图片留给家人。</Text>
     <TextInput value={content} onChangeText={setContent} multiline maxLength={8000} placeholder="摘录一句，或写下阅读感受……" style={{ minHeight: 110, backgroundColor: colors.paperBright, padding: 16, borderRadius: 12, color: colors.ink, textAlignVertical: 'top' }} />
     {photo && <Image source={{ uri: photo.uri }} style={{ height: 180, width: '100%' }} resizeMode="contain" />}
     <ActionButton disabled={busy} onPress={() => void pickPhoto()} quiet>{photo ? '更换书摘图片' : '选择书摘图片'}</ActionButton>
     {photo && <ActionButton onPress={() => setPhoto(null)} quiet>移除图片</ActionButton>}
-    <ActionButton disabled={busy || (!content.trim() && !photo)} onPress={() => void publish()}>{busy ? '处理中……' : '分享到家庭'}</ActionButton>
+    <ActionButton disabled={busy || (!content.trim() && !photo)} loading={busy} onPress={() => void publish()}>{busy ? '处理中……' : '分享到家庭'}</ActionButton>
     {!!message && <Text accessibilityRole="alert" style={{ color: colors.terracotta }}>{message}</Text>}
     {excerpts.map((item) => <View key={item.id} style={{ backgroundColor: colors.paperBright, borderRadius: 12, padding: 18, gap: 10 }}>
       <Text style={{ color: colors.muted, fontSize: 12 }}>{item.username} · {new Date(item.created_at).toLocaleDateString('zh-CN')}</Text>
