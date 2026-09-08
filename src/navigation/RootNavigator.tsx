@@ -25,7 +25,7 @@ const Tabs = createBottomTabNavigator<MainTabParamList>()
 const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: colors.paper, card: colors.paperBright, text: colors.ink, border: colors.line, primary: colors.terracotta } }
 
 function MainTabs() {
-  return <Tabs.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.terracotta, tabBarInactiveTintColor: colors.muted, tabBarStyle: { backgroundColor: colors.paperBright, borderTopColor: colors.line, height: 72, paddingBottom: 12, paddingTop: 8 }, tabBarLabelStyle: { fontSize: 11 } }}><Tabs.Screen name="Home" component={HomeScreen} options={{ title: '工作台' }} /><Tabs.Screen name="Catalog" component={CatalogScreen} options={{ title: '藏书' }} /><Tabs.Screen name="Loans" component={LoansScreen} options={{ title: '借阅' }} /><Tabs.Screen name="Profile" component={ProfileScreen} options={{ title: '我的' }} /></Tabs.Navigator>
+  return <Tabs.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.terracotta, tabBarInactiveTintColor: colors.muted, tabBarStyle: { backgroundColor: colors.paperBright, borderTopColor: colors.line, height: 72, paddingBottom: 12, paddingTop: 8 }, tabBarLabelStyle: { fontSize: 11 } }}><Tabs.Screen name="Home" component={HomeScreen} options={{ title: '首页' }} /><Tabs.Screen name="Catalog" component={CatalogScreen} options={{ title: '藏书' }} /><Tabs.Screen name="Loans" component={LoansScreen} options={{ title: '借阅' }} /><Tabs.Screen name="Profile" component={ProfileScreen} options={{ title: '我的' }} /></Tabs.Navigator>
 }
 
 export function RootNavigator() {
