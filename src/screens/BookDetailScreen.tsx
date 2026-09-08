@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
 import { BookReadingPanel } from "../components/BookReadingPanel";
@@ -12,6 +12,11 @@ import { LoadingState } from "../components/LoadingState";
 import { StatusPill } from "../components/StatusPill";
 import { useFamily } from "../context/FamilyContext";
 import { apiClient } from "../lib/api";
+import {
+  bookDetailCoverWidth,
+  missingMetadataPatch,
+  pickDescription,
+} from "../lib/bookDetail";
 import type { Book, BookCopy, Membership } from "../lib/types";
 import type { RootStackParamList } from "../navigation/types";
 import { colors } from "../theme/colors";
@@ -29,6 +34,8 @@ export function BookDetailScreen({ route, navigation }: Props) {
   const [checkoutCopy, setCheckoutCopy] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
+  const isTablet = windowWidth >= 768;
   useFocusEffect(
     useCallback(() => {
       if (!familyId) return;
@@ -41,10 +48,33 @@ export function BookDetailScreen({ route, navigation }: Props) {
           "/memberships/",
         ),
       ])
-        .then(([b, c, m]) => {
+        .then(async ([b, c, m]) => {
           setBook(b);
           setCopies(asList(c).filter((x) => x.book === route.params.bookId));
           setMembers(asList(m));
+          if (!b.description?.trim()) {
+            try {
+              const candidates = await apiClient.get<
+                Record<string, string | null>[]
+              >(`/book-metadata/search/?q=${encodeURIComponent(b.title)}`);
+              const description = pickDescription(candidates);
+              const remote = candidates.find((candidate) =>
+                candidate.description?.trim(),
+              );
+              if (remote && description) {
+                const patch = missingMetadataPatch(b, {
+                  ...remote,
+                  description,
+                });
+                if (Object.keys(patch).length)
+                  setBook(
+                    await apiClient.patch<Book>(`/books/${b.id}/`, patch),
+                  );
+              }
+            } catch {
+              // Enrichment is best-effort and must not block opening the book.
+            }
+          }
         })
         .catch(() => setError("这本书暂时无法打开。"));
     }, [familyId, route.params.bookId]),
@@ -89,46 +119,81 @@ export function BookDetailScreen({ route, navigation }: Props) {
     );
   return (
     <ScrollView
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: 120, paddingTop: spacing.xl }}
+      contentContainerStyle={{
+        padding: spacing.lg,
+        paddingBottom: 120,
+        paddingTop: spacing.xl,
+      }}
       style={{ backgroundColor: colors.paper }}
     >
       <ActionButton quiet onPress={() => navigation.goBack()}>
         ← 返回藏书
       </ActionButton>
-      <View style={{ marginTop: spacing.md }}>
-      <BookCover
-        category={book.category}
-        coverUrl={book.cover_url || book.cover}
-        seed={book.id}
-        title={book.title}
-      />
+      <View
+        style={{ flexDirection: "row", gap: spacing.lg, marginTop: spacing.lg }}
+      >
+        <BookCover
+          category={book.category}
+          coverUrl={book.cover_url || book.cover}
+          seed={book.id}
+          title={book.title}
+          width={bookDetailCoverWidth(windowWidth, isTablet)}
+        />
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <Text
+            style={{
+              color: colors.terracotta,
+              fontFamily: typography.mono,
+              fontSize: 10,
+            }}
+          >
+            {book.category || "家庭藏书"}
+          </Text>
+          <Text
+            style={{
+              color: colors.ink,
+              fontFamily: typography.display,
+              fontSize: isTablet ? 34 : 28,
+              marginTop: spacing.sm,
+            }}
+          >
+            {book.title}
+          </Text>
+          <Text style={{ color: colors.terracotta, marginTop: spacing.sm }}>
+            {book.author || "作者未录入"}
+          </Text>
+          {[
+            book.publisher && `出版社：${book.publisher}`,
+            book.publish_date && `出版日期：${book.publish_date}`,
+            book.isbn && `ISBN：${book.isbn}`,
+          ]
+            .filter(Boolean)
+            .map((line) => (
+              <Text
+                key={line}
+                style={{ color: colors.muted, fontSize: 11, marginTop: 6 }}
+              >
+                {line}
+              </Text>
+            ))}
+        </View>
       </View>
-      <Text
-        style={{
-          color: colors.terracotta,
-          fontFamily: typography.mono,
-          fontSize: 10,
-          marginTop: spacing.xl,
-        }}
-      >
-        {book.category || "家庭藏书"}
-      </Text>
-      <Text
-        style={{
-          color: colors.ink,
-          fontFamily: typography.display,
-          fontSize: 40,
-          marginTop: 13,
-        }}
-      >
-        {book.title}
-      </Text>
-      <Text style={{ color: colors.terracotta, marginTop: 12 }}>
-        {book.author || "作者未录入"}
-      </Text>
-      <Text style={{ color: colors.muted, lineHeight: 22, marginTop: 22 }}>
-        {book.description || "这本书还没有留下介绍，先从书名开始认识它。"}
-      </Text>
+      <View style={{ marginTop: spacing.xl }}>
+        <Text
+          style={{
+            color: colors.ink,
+            fontFamily: typography.display,
+            fontSize: 26,
+          }}
+        >
+          内容简介
+        </Text>
+        <Text
+          style={{ color: colors.muted, lineHeight: 22, marginTop: spacing.sm }}
+        >
+          {book.description || "暂未找到简介，可以稍后重试联网刮削。"}
+        </Text>
+      </View>
       <View
         style={{
           borderTopColor: colors.line,
