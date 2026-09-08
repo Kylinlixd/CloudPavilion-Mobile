@@ -80,9 +80,9 @@ function FormField({ label, value, onChangeText, multiline = false, placeholder 
 export function AddBookScreen({ navigation }: Props) {
   const { familyId } = useFamily()
   const [permission, requestPermission] = useCameraPermissions()
-  const [mode, setMode] = useState<Mode>('scan')
+  const [mode, setMode] = useState<Mode>('manual')
   const [draft, setDraft] = useState<BookDraft>(EMPTY_DRAFT)
-  const [scanning, setScanning] = useState(true)
+  const [scanning, setScanning] = useState(false)
   const [lookupPending, setLookupPending] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -175,7 +175,7 @@ export function AddBookScreen({ navigation }: Props) {
     <MetadataPicker onCameraOpening={() => { setMode('manual'); setScanning(false) }} onChoose={({ source: _source, ...metadata }) => { setDraft((current) => ({ ...current, ...metadata, publish_date: metadata.publish_date || '' })); setMode('manual'); setScanning(false); setMessage('请确认识别或搜索结果后保存。') }} />
 
     <View style={{ backgroundColor: colors.paperBright, borderRadius: 12, flexDirection: 'row', gap: 6, marginTop: spacing.xl, padding: 5 }}>
-      {(['scan', 'manual'] as const).map((value) => <TouchableOpacity key={value} onPress={() => { setMode(value); setMessage(''); if (value === 'scan') setScanning(true) }} style={{ alignItems: 'center', backgroundColor: mode === value ? colors.ink : 'transparent', borderRadius: 9, flex: 1, paddingVertical: 12 }}>
+      {(['manual', 'scan'] as const).map((value) => <TouchableOpacity key={value} onPress={() => { setMode(value); setMessage(''); setScanning(value === 'scan') }} style={{ alignItems: 'center', backgroundColor: mode === value ? colors.ink : 'transparent', borderRadius: 9, flex: 1, paddingVertical: 12 }}>
         <Text style={{ color: mode === value ? colors.white : colors.muted, fontFamily: typography.body, fontSize: 13 }}>{value === 'scan' ? '扫码添加' : '手动添加'}</Text>
       </TouchableOpacity>)}
     </View>
