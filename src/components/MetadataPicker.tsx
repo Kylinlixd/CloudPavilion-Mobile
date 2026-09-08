@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
+import { Image, Text, TextInput, View } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { ActionButton } from './ActionButton'
 import { apiClient } from '../lib/api'
@@ -41,6 +41,6 @@ export function MetadataPicker({ onChoose, onCameraOpening }: { onChoose: (book:
     <ActionButton disabled={busy || query.trim().length < 2} onPress={() => void search()} quiet>{busy ? '识别查找中……' : '联网搜索书目信息'}</ActionButton>
     {!!message && <Text style={{ color: colors.terracotta, lineHeight: 22 }}>{message}</Text>}
     {!!text && <><Text selectable numberOfLines={8} style={{ color: colors.muted, lineHeight: 22 }}>{text}</Text><ActionButton quiet disabled={busy || !query.trim()} onPress={() => onChoose({ title: query.trim(), author: '', isbn: '', publisher: '', publish_date: '', category: '', description: '', cover_url: '', source: 'local' })}>用识别书名填写，再手动补充</ActionButton></>}
-    {results.map((book, index) => <ActionButton key={`${book.isbn}-${index}`} quiet onPress={() => onChoose(book)}>{book.title} · {book.author || '作者未提供'}{book.publisher ? ` · ${book.publisher}` : ''}</ActionButton>)}
+    {results.map((book, index) => <View key={`${book.isbn}-${index}`} style={{ alignItems: 'center', flexDirection: 'row', gap: 10 }}><>{book.cover_url ? <Image accessibilityLabel={`${book.title}封面`} source={{ uri: book.cover_url }} style={{ backgroundColor: colors.paperBright, borderRadius: 6, height: 54, width: 38 }} /> : <View style={{ backgroundColor: colors.paperBright, borderRadius: 6, height: 54, width: 38 }} />}</><View style={{ flex: 1 }}><ActionButton quiet onPress={() => onChoose(book)}>{book.title} · {book.author || '作者未提供'}{book.publisher ? ` · ${book.publisher}` : ''}</ActionButton></View></View>)}
   </View>
 }

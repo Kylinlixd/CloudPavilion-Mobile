@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 
@@ -18,6 +19,7 @@ import type { RootStackParamList } from '../navigation/types'
 import { colors } from '../theme/colors'
 import { spacing } from '../theme/spacing'
 import { typography } from '../theme/typography'
+import { errorMessage, uploadFile } from '../lib/reading'
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddBook'>
@@ -87,6 +89,21 @@ export function AddBookScreen({ navigation }: Props) {
 
   function update(field: keyof BookDraft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }))
+  }
+
+  async function chooseLocalCover(camera: boolean) {
+    try {
+      const permission = camera ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (!permission.granted) { setMessage(camera ? '请允许云阁使用相机，或改用相册选择封面。' : '请允许云阁访问照片，以选择本地封面。'); return }
+      const result = camera
+        ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.9 })
+        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.9 })
+      if (result.canceled) return
+      setMessage('正在上传本地封面……')
+      const uploaded = await uploadFile<{ cover_url: string }>('/book-metadata/cover/', 'image', result.assets[0])
+      update('cover_url', uploaded.cover_url)
+      setMessage('本地封面已上传，将覆盖联网封面。')
+    } catch (error) { setMessage(errorMessage(error)) }
   }
 
   async function handleScan(result: BarcodeScanningResult) {
@@ -180,7 +197,8 @@ export function AddBookScreen({ navigation }: Props) {
         {!scanning && !lookupPending ? <View style={{ marginTop: spacing.md }}><ActionButton onPress={() => { setMessage(''); setScanning(true) }} quiet>重新扫描</ActionButton></View> : null}
       </>}
     </View> : <View style={{ gap: spacing.md, marginTop: spacing.lg }}>
-      {draft.cover_url ? <Image accessibilityLabel="查询到的书籍封面" resizeMode="contain" source={{ uri: draft.cover_url }} style={{ alignSelf: 'center', backgroundColor: colors.paperBright, borderRadius: 12, height: 210, width: 150 }} /> : null}
+      {draft.cover_url ? <Image accessibilityLabel="查询到的书籍封面" resizeMode="contain" source={{ uri: draft.cover_url }} style={{ alignSelf: 'center', backgroundColor: colors.paperBright, borderRadius: 12, height: 210, width: 150 }} /> : <Text style={{ color: colors.muted, textAlign: 'center' }}>未找到可靠封面，可上传本地照片</Text>}
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}><View style={{ flex: 1 }}><ActionButton onPress={() => void chooseLocalCover(false)} quiet>从相册选择封面</ActionButton></View><View style={{ flex: 1 }}><ActionButton onPress={() => void chooseLocalCover(true)} quiet>拍照封面</ActionButton></View></View>
       <FormField label="书名 *" onChangeText={(value) => update('title', value)} placeholder="请输入书名" value={draft.title} />
       <FormField label="作者" onChangeText={(value) => update('author', value)} placeholder="作者姓名" value={draft.author} />
       <FormField label="ISBN" onChangeText={(value) => update('isbn', value)} placeholder="10 位或 13 位 ISBN（可不填）" value={draft.isbn} />
