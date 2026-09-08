@@ -11,8 +11,8 @@ export function bookDetailCoverWidth(windowWidth: number, isTablet: boolean) {
   const contentWidth = Math.max(0, windowWidth - 32);
   const preferred = Math.round(contentWidth * (isTablet ? 0.3 : 0.405));
   return Math.min(
-    isTablet ? 250 : 145,
-    Math.max(isTablet ? 210 : 120, preferred),
+    isTablet ? 230 : 130,
+    Math.max(isTablet ? 190 : 112, preferred),
   );
 }
 

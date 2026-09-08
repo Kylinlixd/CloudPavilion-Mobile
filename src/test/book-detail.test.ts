@@ -7,8 +7,8 @@ import {
 
 describe("book detail metadata layout", () => {
   it("uses a wider cover ratio on phone and compact ratio on tablet", () => {
-    expect(bookDetailCoverWidth(390, false)).toBe(145);
-    expect(bookDetailCoverWidth(1024, true)).toBe(250);
+    expect(bookDetailCoverWidth(390, false)).toBe(130);
+    expect(bookDetailCoverWidth(1024, true)).toBe(230);
   });
 
   it("chooses the first candidate with a non-empty description", () => {

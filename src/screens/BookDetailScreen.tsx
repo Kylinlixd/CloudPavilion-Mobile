@@ -130,7 +130,16 @@ export function BookDetailScreen({ route, navigation }: Props) {
         ← 返回藏书
       </ActionButton>
       <View
-        style={{ flexDirection: "row", gap: spacing.lg, marginTop: spacing.lg }}
+        style={{
+          backgroundColor: colors.paperBright,
+          borderColor: colors.line,
+          borderRadius: 18,
+          borderWidth: 1,
+          flexDirection: "row",
+          gap: spacing.lg,
+          marginTop: spacing.xl,
+          padding: spacing.md,
+        }}
       >
         <BookCover
           category={book.category}
@@ -178,7 +187,14 @@ export function BookDetailScreen({ route, navigation }: Props) {
             ))}
         </View>
       </View>
-      <View style={{ marginTop: spacing.xl }}>
+      <View
+        style={{
+          borderTopColor: colors.line,
+          borderTopWidth: 1,
+          marginTop: spacing.xl,
+          paddingTop: spacing.lg,
+        }}
+      >
         <Text
           style={{
             color: colors.ink,
@@ -189,7 +205,7 @@ export function BookDetailScreen({ route, navigation }: Props) {
           内容简介
         </Text>
         <Text
-          style={{ color: colors.muted, lineHeight: 22, marginTop: spacing.sm }}
+          style={{ color: colors.muted, lineHeight: 24, marginTop: spacing.sm }}
         >
           {book.description || "暂未找到简介，可以稍后重试联网刮削。"}
         </Text>
