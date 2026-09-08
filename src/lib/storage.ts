@@ -32,3 +32,7 @@ export async function clearSession() {
 export function setFamilyId(id: number | string) {
   return SecureStore.setItemAsync(storageKeys.family, String(id))
 }
+
+export function clearFamilyId() {
+  return SecureStore.deleteItemAsync(storageKeys.family)
+}

@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { apiClient } from '../lib/api'
 import { logoutAccount, registerAccount } from '../lib/auth'
-import { getRefreshToken, setSession } from '../lib/storage'
+import { clearFamilyId, getRefreshToken, setSession } from '../lib/storage'
 
 vi.mock('../lib/api', () => ({ apiClient: { post: vi.fn() } }))
-vi.mock('../lib/storage', () => ({ getRefreshToken: vi.fn(), setSession: vi.fn() }))
+vi.mock('../lib/storage', () => ({ clearFamilyId: vi.fn(), getRefreshToken: vi.fn(), setSession: vi.fn() }))
 
 describe('registration', () => {
   beforeEach(() => vi.clearAllMocks())
@@ -24,6 +24,7 @@ describe('registration', () => {
       password_confirm: 'Safe-cloud-2026!',
     })
     expect(setSession).toHaveBeenCalledWith('access-token', 'refresh-token')
+    expect(clearFamilyId).toHaveBeenCalled()
   })
 
   it('sends the refresh token when logging out', async () => {

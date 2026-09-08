@@ -1,5 +1,5 @@
 import { apiClient } from './api'
-import { getRefreshToken, setSession } from './storage'
+import { clearFamilyId, getRefreshToken, setSession } from './storage'
 
 type AuthResponse = {
   user?: { id: number; username: string }
@@ -8,6 +8,8 @@ type AuthResponse = {
 }
 
 async function persist(result: AuthResponse) {
+  // A family belongs to the previous account; never carry it across sessions.
+  await clearFamilyId()
   await setSession(result.access, result.refresh)
   return result.access
 }
