@@ -1,24 +1,35 @@
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from "expo-secure-store";
 
 export const storageKeys = {
-  access: 'cloudpavilion.access',
-  refresh: 'cloudpavilion.refresh',
-  family: 'cloudpavilion.family',
-} as const
+  access: "cloudpavilion.access",
+  refresh: "cloudpavilion.refresh",
+  family: "cloudpavilion.family",
+} as const;
 
-export const getAccessToken = () => SecureStore.getItemAsync(storageKeys.access)
-export const getRefreshToken = () => SecureStore.getItemAsync(storageKeys.refresh)
-export const getFamilyId = () => SecureStore.getItemAsync(storageKeys.family)
+export const getAccessToken = () =>
+  SecureStore.getItemAsync(storageKeys.access);
+export const getRefreshToken = () =>
+  SecureStore.getItemAsync(storageKeys.refresh);
+export const getFamilyId = () => SecureStore.getItemAsync(storageKeys.family);
+
+export async function getSession() {
+  const [access, refresh, family] = await Promise.all([
+    getAccessToken(),
+    getRefreshToken(),
+    getFamilyId(),
+  ]);
+  return { access, refresh, family };
+}
 
 export async function setSession(access: string, refresh: string) {
   await Promise.all([
     SecureStore.setItemAsync(storageKeys.access, access),
     SecureStore.setItemAsync(storageKeys.refresh, refresh),
-  ])
+  ]);
 }
 
 export function setAccessToken(access: string) {
-  return SecureStore.setItemAsync(storageKeys.access, access)
+  return SecureStore.setItemAsync(storageKeys.access, access);
 }
 
 export async function clearSession() {
@@ -26,13 +37,13 @@ export async function clearSession() {
     SecureStore.deleteItemAsync(storageKeys.access),
     SecureStore.deleteItemAsync(storageKeys.refresh),
     SecureStore.deleteItemAsync(storageKeys.family),
-  ])
+  ]);
 }
 
 export function setFamilyId(id: number | string) {
-  return SecureStore.setItemAsync(storageKeys.family, String(id))
+  return SecureStore.setItemAsync(storageKeys.family, String(id));
 }
 
 export function clearFamilyId() {
-  return SecureStore.deleteItemAsync(storageKeys.family)
+  return SecureStore.deleteItemAsync(storageKeys.family);
 }

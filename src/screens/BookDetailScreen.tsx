@@ -17,7 +17,13 @@ import {
   missingMetadataPatch,
   pickDescription,
 } from "../lib/bookDetail";
-import type { Book, BookCopy, Membership } from "../lib/types";
+import type {
+  Book,
+  BookCopy,
+  Loan,
+  Membership,
+  Reservation,
+} from "../lib/types";
 import type { RootStackParamList } from "../navigation/types";
 import { colors } from "../theme/colors";
 import { spacing } from "../theme/spacing";
@@ -31,9 +37,11 @@ export function BookDetailScreen({ route, navigation }: Props) {
   const [book, setBook] = useState<Book | null>(null);
   const [copies, setCopies] = useState<BookCopy[]>([]);
   const [members, setMembers] = useState<Membership[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [checkoutCopy, setCheckoutCopy] = useState<number | null>(null);
   const [error, setError] = useState("");
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
   const { width: windowWidth } = useWindowDimensions();
   const isTablet = windowWidth >= 768;
   useFocusEffect(
@@ -47,11 +55,17 @@ export function BookDetailScreen({ route, navigation }: Props) {
         apiClient.get<Membership[] | { results: Membership[] }>(
           "/memberships/",
         ),
+        apiClient.get<Loan[] | { results: Loan[] }>("/loans/"),
+        apiClient.get<Reservation[] | { results: Reservation[] }>(
+          "/reservations/",
+        ),
       ])
-        .then(async ([b, c, m]) => {
+        .then(async ([b, c, m, l, r]) => {
           setBook(b);
           setCopies(asList(c).filter((x) => x.book === route.params.bookId));
           setMembers(asList(m));
+          setLoans(asList(l));
+          setReservations(asList(r));
           if (!b.description?.trim()) {
             try {
               const candidates = await apiClient.get<
@@ -80,18 +94,18 @@ export function BookDetailScreen({ route, navigation }: Props) {
     }, [familyId, route.params.bookId]),
   );
   async function reserve(copyId: number) {
-    setPending(true);
+    setPending(`${copyId}:reserve`);
     try {
       await apiClient.post("/reservations/", { copy_id: copyId });
       setError("已加入预约队列。");
     } catch (e) {
       setError(errorMessage(e));
     } finally {
-      setPending(false);
+      setPending(null);
     }
   }
   async function checkout(copyId: number, borrowerId: number, dueAt: string) {
-    setPending(true);
+    setPending(`${copyId}:checkout`);
     try {
       await apiClient.post("/loans/checkout/", {
         copy_id: copyId,
@@ -108,7 +122,7 @@ export function BookDetailScreen({ route, navigation }: Props) {
     } catch (e) {
       setError(errorMessage(e));
     } finally {
-      setPending(false);
+      setPending(null);
     }
   }
   if (!book)
@@ -258,28 +272,62 @@ export function BookDetailScreen({ route, navigation }: Props) {
             <StatusPill status={copy.status} />
             {copy.status === "available" ? (
               <ActionButton
-                disabled={pending}
-                loading={pending}
+                disabled={Boolean(pending)}
+                loading={pending === `${copy.id}:checkout`}
                 onPress={() => setCheckoutCopy(copy.id)}
               >
                 借出
               </ActionButton>
             ) : copy.status === "borrowed" ? (
-              <ActionButton
-                disabled={pending}
-                loading={pending}
-                onPress={() => void reserve(copy.id)}
-                quiet
-              >
-                预约
-              </ActionButton>
+              (() => {
+                const loan = loans.find(
+                  (item) => item.copy === copy.id && item.is_active,
+                );
+                const reservation = reservations.find(
+                  (item) => item.copy === copy.id && item.status === "pending",
+                );
+                if (loan?.can_return)
+                  return (
+                    <ActionButton
+                      onPress={() =>
+                        (navigation as any).navigate("Main", {
+                          screen: "Loans",
+                        })
+                      }
+                      quiet
+                    >
+                      管理借阅
+                    </ActionButton>
+                  );
+                if (reservation)
+                  return (
+                    <ActionButton disabled quiet>
+                      已预约
+                      {reservation.queue_position == null
+                        ? ""
+                        : ` · 第 ${reservation.queue_position} 位`}
+                    </ActionButton>
+                  );
+                if (loan?.can_reserve)
+                  return (
+                    <ActionButton
+                      disabled={Boolean(pending)}
+                      loading={pending === `${copy.id}:reserve`}
+                      onPress={() => void reserve(copy.id)}
+                      quiet
+                    >
+                      预约
+                    </ActionButton>
+                  );
+                return null;
+              })()
             ) : null}
           </View>
         ))}
       </View>
       <BookReadingPanel bookId={book.id} title={book.title} />
       <CheckoutSheet
-        busy={pending}
+        busy={pending !== null}
         members={members}
         onClose={() => setCheckoutCopy(null)}
         onSubmit={(borrowerId, dueAt) =>

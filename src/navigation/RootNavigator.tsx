@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { colors } from '../theme/colors'
 import type { MainTabParamList, RootStackParamList } from './types'
 import { LoadingState } from '../components/LoadingState'
+import { ErrorState } from '../components/ErrorState'
 import { LoginScreen } from '../screens/LoginScreen'
 import { RegisterScreen } from '../screens/RegisterScreen'
 import { AddBookScreen } from '../screens/AddBookScreen'
@@ -39,7 +40,8 @@ function MainTabs() {
 }
 
 export function RootNavigator() {
-  const { isAuthenticated, hydrating } = useAuth()
+  const { isAuthenticated, hydrating, hydrationError, retryHydration } = useAuth()
   if (hydrating) return <LoadingState label="正在打开书房" />
+  if (hydrationError) return <ErrorState message={hydrationError} onRetry={retryHydration} />
   return <NavigationContainer theme={navTheme}><Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>{!isAuthenticated ? <><Root.Screen name="Login" component={LoginScreen} /><Root.Screen name="Register" component={RegisterScreen} /></> : <><Root.Screen name="Main" component={MainTabs} /><Root.Screen name="AddBook" component={AddBookScreen} /><Root.Screen name="BookDetail" component={BookDetailScreen} /><Root.Screen name="Reader" component={ReaderScreen} /><Root.Screen name="Reservations" component={ReservationsScreen} /><Root.Screen name="Reports" component={ReportsScreen} /><Root.Screen name="Settings" component={SettingsScreen} /><Root.Screen name="Notifications" component={NotificationsScreen} /></>}</Root.Navigator></NavigationContainer>
 }
