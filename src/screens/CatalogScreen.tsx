@@ -11,8 +11,11 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ActionButton } from "../components/ActionButton";
+import { ErrorState } from "../components/ErrorState";
 import { EmptyState } from "../components/EmptyState";
 import { ImportEbookButton } from "../components/ImportEbookButton";
 import { BookCover } from "../components/BookCover";
@@ -44,6 +47,7 @@ export function CatalogScreen() {
   const navigation = useNavigation<any>();
   const { familyId } = useFamily();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const columns = width >= 700 ? 6 : 3;
   const [books, setBooks] = useState<Book[]>([]);
   const [query, setQuery] = useState("");
@@ -115,6 +119,13 @@ export function CatalogScreen() {
           }),
       },
     ]);
+  const retry = () => {
+    setError("");
+    setLoading(true);
+    void load()
+      .catch(() => setError("藏书暂时无法加载。"))
+      .finally(() => setLoading(false));
+  };
   if (loading && !books.length) return <LoadingState label="正在翻找藏书" />;
   const itemWidth = Math.max(
     44,
@@ -152,14 +163,7 @@ export function CatalogScreen() {
           </TouchableOpacity>
         </View>
       ) : (
-        <View
-          style={{
-            alignItems: "center",
-            flexDirection: "row",
-            gap: spacing.sm,
-            marginBottom: spacing.md,
-          }}
-        >
+        <View style={{ marginBottom: spacing.md }}>
           <TextInput
             accessibilityLabel="搜索藏书"
             onChangeText={setQuery}
@@ -171,17 +175,52 @@ export function CatalogScreen() {
               borderRadius: 10,
               borderWidth: 1,
               color: colors.ink,
-              flex: 1,
               height: 48,
               paddingHorizontal: 14,
             }}
           />
-          <TouchableOpacity onPress={() => setImportOpen(true)}>
-            <Text style={{ color: colors.terracotta }}>导入</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSelecting(true)}>
-            <Text style={{ color: colors.ink }}>选择</Text>
-          </TouchableOpacity>
+          <View
+            style={{
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: spacing.md,
+            }}
+          >
+            <Text
+              style={{ color: colors.ink, fontSize: 22, fontWeight: "700" }}
+            >
+              书架
+            </Text>
+            <View style={{ flexDirection: "row", gap: spacing.lg }}>
+              <TouchableOpacity
+                accessibilityLabel="导入书籍"
+                accessibilityRole="button"
+                onPress={() => setImportOpen(true)}
+                style={{ alignItems: "center", flexDirection: "row", gap: 5 }}
+              >
+                <Ionicons
+                  color={colors.terracotta}
+                  name="add-circle-outline"
+                  size={20}
+                />
+                <Text style={{ color: colors.terracotta }}>导入</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityLabel="选择书籍"
+                accessibilityRole="button"
+                onPress={() => setSelecting(true)}
+                style={{ alignItems: "center", flexDirection: "row", gap: 5 }}
+              >
+                <Ionicons
+                  color={colors.ink}
+                  name="checkmark-circle-outline"
+                  size={20}
+                />
+                <Text style={{ color: colors.ink }}>选择</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       )}
       {!selecting && (
@@ -221,106 +260,123 @@ export function CatalogScreen() {
         </View>
       )}
       {error ? (
-        <Text
-          accessibilityRole="alert"
-          style={{ color: colors.danger, marginBottom: spacing.sm }}
-        >
-          {error}
-        </Text>
-      ) : null}
-      <FlatList
-        columnWrapperStyle={{ gap: spacing.sm }}
-        contentContainerStyle={{
-          gap: spacing.md,
-          paddingBottom: selecting ? 180 : 120,
-        }}
-        data={books}
-        keyExtractor={(book) => String(book.id)}
-        numColumns={columns}
-        onEndReached={() =>
-          void loadMore().catch(() => setError("更多藏书加载失败。"))
-        }
-        onEndReachedThreshold={0.65}
-        refreshControl={
-          <RefreshControl
-            colors={[colors.terracotta]}
-            onRefresh={() => {
-              setRefreshing(true);
-              void load()
-                .catch(() => setError("藏书暂时无法加载。"))
-                .finally(() => setRefreshing(false));
-            }}
-            refreshing={refreshing}
-          />
-        }
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() =>
-              selecting
-                ? toggle(item.id)
-                : navigation.navigate("BookDetail", { bookId: item.id })
-            }
-            style={{ width: itemWidth }}
-          >
-            <View>
-              <BookCover
-                category={item.category}
-                coverUrl={item.cover_url || item.cover}
-                seed={item.id}
-                small
-                title={item.title}
-              />
-              {selecting && (
-                <View
-                  style={{
-                    alignItems: "center",
-                    backgroundColor: selected.includes(item.id)
-                      ? colors.terracotta
-                      : colors.paperBright,
-                    borderColor: colors.white,
-                    borderRadius: 12,
-                    borderWidth: 2,
-                    height: 24,
-                    justifyContent: "center",
-                    position: "absolute",
-                    right: 5,
-                    top: 5,
-                    width: 24,
-                  }}
-                >
-                  <Text
+        <ErrorState message={error} onRetry={retry} />
+      ) : (
+        <FlatList
+          columnWrapperStyle={{ gap: spacing.sm }}
+          contentContainerStyle={{
+            gap: spacing.md,
+            paddingBottom: selecting ? 180 : 120,
+          }}
+          data={books}
+          keyExtractor={(book) => String(book.id)}
+          numColumns={columns}
+          onEndReached={() =>
+            void loadMore().catch(() => setError("更多藏书加载失败。"))
+          }
+          onEndReachedThreshold={0.65}
+          refreshControl={
+            <RefreshControl
+              colors={[colors.terracotta]}
+              onRefresh={() => {
+                setRefreshing(true);
+                void load()
+                  .catch(() => setError("藏书暂时无法加载。"))
+                  .finally(() => setRefreshing(false));
+              }}
+              refreshing={refreshing}
+            />
+          }
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() =>
+                selecting
+                  ? toggle(item.id)
+                  : navigation.navigate("BookDetail", { bookId: item.id })
+              }
+              style={{ width: itemWidth }}
+            >
+              <View>
+                <BookCover
+                  category={item.category}
+                  coverUrl={item.cover_url || item.cover}
+                  seed={item.id}
+                  small
+                  title={item.title}
+                />
+                {selecting && (
+                  <View
                     style={{
-                      color: selected.includes(item.id)
-                        ? colors.white
-                        : colors.muted,
-                      fontSize: 14,
+                      alignItems: "center",
+                      backgroundColor: selected.includes(item.id)
+                        ? colors.terracotta
+                        : colors.paperBright,
+                      borderColor: colors.white,
+                      borderRadius: 12,
+                      borderWidth: 2,
+                      height: 24,
+                      justifyContent: "center",
+                      position: "absolute",
+                      right: 5,
+                      top: 5,
+                      width: 24,
                     }}
                   >
-                    {selected.includes(item.id) ? "✓" : ""}
-                  </Text>
-                </View>
-              )}
+                    <Text
+                      style={{
+                        color: selected.includes(item.id)
+                          ? colors.white
+                          : colors.muted,
+                        fontSize: 14,
+                      }}
+                    >
+                      {selected.includes(item.id) ? "✓" : ""}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <Text
+                numberOfLines={2}
+                style={{ color: colors.ink, fontSize: 10, marginTop: 5 }}
+              >
+                {item.title}
+              </Text>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            query.trim() ? (
+              <View style={{ alignItems: "center", paddingTop: spacing.xxl }}>
+                <Text
+                  style={{ color: colors.ink, fontSize: 20, fontWeight: "700" }}
+                >
+                  没有找到相关书籍
+                </Text>
+                <Text style={{ color: colors.muted, marginTop: spacing.sm }}>
+                  试试其他书名、作者或分类
+                </Text>
+                <TouchableOpacity
+                  accessibilityLabel="清除搜索"
+                  accessibilityRole="button"
+                  onPress={() => setQuery("")}
+                  style={{ marginTop: spacing.md }}
+                >
+                  <Text style={{ color: colors.terracotta }}>清除搜索</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <EmptyState title="书架还是空的" copy="点击右侧导入第一本书。" />
+            )
+          }
+          ListFooterComponent={
+            <View style={{ alignItems: "center", paddingTop: spacing.lg }}>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>
+                共 {totalBookCount} 个书名 · {totalCopyCount} 本实体书
+                {loadingMore ? " · 正在加载" : ""}
+              </Text>
             </View>
-            <Text
-              numberOfLines={2}
-              style={{ color: colors.ink, fontSize: 10, marginTop: 5 }}
-            >
-              {item.title}
-            </Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={
-          <EmptyState title="书架还是空的" copy="点击右侧导入第一本书。" />
-        }
-        ListFooterComponent={
-          <View style={{ alignItems: "center", paddingTop: spacing.lg }}>
-            <Text style={{ color: colors.muted, fontSize: 12 }}>
-              共 {totalBookCount} 个书名 · {totalCopyCount} 本实体书
-              {loadingMore ? " · 正在加载" : ""}
-            </Text>
-          </View>
-        }
-      />
+          }
+        />
+      )}
       {selecting && (
         <View
           style={{
@@ -356,10 +412,16 @@ export function CatalogScreen() {
               borderTopLeftRadius: 22,
               borderTopRightRadius: 22,
               padding: spacing.xl,
+              paddingBottom: Math.max(spacing.xl, insets.bottom + spacing.md),
             }}
           >
             <Text
-              style={{ color: colors.ink, fontSize: 25, fontWeight: "700" }}
+              style={{
+                color: colors.ink,
+                fontSize: 25,
+                fontWeight: "700",
+                marginBottom: spacing.lg,
+              }}
             >
               导入书籍
             </Text>
@@ -371,7 +433,7 @@ export function CatalogScreen() {
             >
               扫码/拍照添加实体书
             </ActionButton>
-            <View style={{ marginTop: 8 }}>
+            <View style={{ marginTop: spacing.md }}>
               <ImportEbookButton />
             </View>
           </View>
