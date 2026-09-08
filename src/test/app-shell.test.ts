@@ -17,4 +17,20 @@ describe('native app shell', () => {
 
     expect(appConfig.expo.name).toBe('云阁')
   })
+
+  it('configures offline vector icons and Chinese labels for every main tab', () => {
+    const navigatorSource = readFileSync(resolve(projectRoot, 'src/navigation/RootNavigator.tsx'), 'utf8')
+
+    expect(navigatorSource).toContain("import Ionicons from '@expo/vector-icons/Ionicons'")
+    expect(navigatorSource).toContain("Home: 'home-outline'")
+    expect(navigatorSource).toContain("Catalog: 'library-outline'")
+    expect(navigatorSource).toContain("Loans: 'swap-horizontal-outline'")
+    expect(navigatorSource).toContain("Profile: 'person-outline'")
+    expect(navigatorSource).toContain("title: '首页'")
+    expect(navigatorSource).toContain("title: '藏书'")
+    expect(navigatorSource).toContain("title: '借阅'")
+    expect(navigatorSource).toContain("title: '我的'")
+    expect(navigatorSource).toContain('tabBarItemStyle: { flex: 1 }')
+    expect(navigatorSource).toContain('height: 56 + insets.bottom')
+  })
 })

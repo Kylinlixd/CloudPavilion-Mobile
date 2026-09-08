@@ -1,6 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAuth } from '../context/AuthContext'
 import { colors } from '../theme/colors'
@@ -25,7 +27,15 @@ const Tabs = createBottomTabNavigator<MainTabParamList>()
 const navTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: colors.paper, card: colors.paperBright, text: colors.ink, border: colors.line, primary: colors.terracotta } }
 
 function MainTabs() {
-  return <Tabs.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.terracotta, tabBarInactiveTintColor: colors.muted, tabBarStyle: { backgroundColor: colors.paperBright, borderTopColor: colors.line, height: 72, paddingBottom: 12, paddingTop: 8 }, tabBarLabelStyle: { fontSize: 11 } }}><Tabs.Screen name="Home" component={HomeScreen} options={{ title: '首页' }} /><Tabs.Screen name="Catalog" component={CatalogScreen} options={{ title: '藏书' }} /><Tabs.Screen name="Loans" component={LoansScreen} options={{ title: '借阅' }} /><Tabs.Screen name="Profile" component={ProfileScreen} options={{ title: '我的' }} /></Tabs.Navigator>
+  const insets = useSafeAreaInsets()
+  const iconForRoute = {
+    Home: 'home-outline',
+    Catalog: 'library-outline',
+    Loans: 'swap-horizontal-outline',
+    Profile: 'person-outline',
+  } as const
+
+  return <Tabs.Navigator screenOptions={({ route }) => ({ headerShown: false, tabBarActiveTintColor: colors.terracotta, tabBarInactiveTintColor: colors.muted, tabBarIcon: ({ color }) => <Ionicons color={color} name={iconForRoute[route.name]} size={24} />, tabBarStyle: { backgroundColor: colors.paperBright, borderTopColor: colors.line, height: 56 + insets.bottom, paddingBottom: insets.bottom, paddingTop: 7 }, tabBarLabelStyle: { fontSize: 11, marginTop: 1 }, tabBarItemStyle: { flex: 1 } })}><Tabs.Screen name="Home" component={HomeScreen} options={{ title: '首页' }} /><Tabs.Screen name="Catalog" component={CatalogScreen} options={{ title: '藏书' }} /><Tabs.Screen name="Loans" component={LoansScreen} options={{ title: '借阅' }} /><Tabs.Screen name="Profile" component={ProfileScreen} options={{ title: '我的' }} /></Tabs.Navigator>
 }
 
 export function RootNavigator() {
