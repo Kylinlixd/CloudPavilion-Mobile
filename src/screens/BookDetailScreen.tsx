@@ -239,7 +239,7 @@ export function BookDetailScreen({ route, navigation }: Props) {
             fontSize: 26,
           }}
         >
-          实体副本
+          纸质书
         </Text>
         {error ? (
           <Text
@@ -263,7 +263,7 @@ export function BookDetailScreen({ route, navigation }: Props) {
           >
             <View style={{ flex: 1 }}>
               <Text style={{ color: colors.ink }}>
-                {copy.barcode || `副本 ${copy.id}`}
+                {copy.barcode || `藏书编号 ${copy.id}`}
               </Text>
               <Text style={{ color: colors.muted, fontSize: 11, marginTop: 4 }}>
                 {copy.notes || "没有备注"}

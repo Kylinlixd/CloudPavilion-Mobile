@@ -105,7 +105,7 @@ export function CatalogScreen() {
     setSelected([]);
   };
   const bulkDelete = () =>
-    Alert.alert("删除所选书籍？", `将删除 ${selected.length} 本书及其副本。`, [
+    Alert.alert("删除所选书籍？", `将删除 ${selected.length} 本书及其纸质书。`, [
       { text: "取消", style: "cancel" },
       {
         text: "删除",
@@ -370,7 +370,7 @@ export function CatalogScreen() {
           ListFooterComponent={
             <View style={{ alignItems: "center", paddingTop: spacing.lg }}>
               <Text style={{ color: colors.muted, fontSize: 12 }}>
-                共 {totalBookCount} 个书名 · {totalCopyCount} 本实体书
+                共 {totalBookCount} 个书名 · {totalCopyCount} 本纸质书
                 {loadingMore ? " · 正在加载" : ""}
               </Text>
             </View>

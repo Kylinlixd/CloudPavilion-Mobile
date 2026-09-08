@@ -284,7 +284,7 @@ export function LoansScreen() {
                     style={{ color: colors.muted, fontSize: 12, marginTop: 5 }}
                   >
                     {item.author || "作者未录入"} ·{" "}
-                    {item.barcode || `副本 ${item.copy}`}
+                    {item.barcode || `藏书编号 ${item.copy}`}
                   </Text>
                   <Text
                     style={{ color: colors.muted, fontSize: 12, marginTop: 5 }}
@@ -404,7 +404,7 @@ export function LoansScreen() {
                       ? "还没有借阅"
                       : "还没有结束的借阅"
                 }
-                copy="去藏书里选择书籍，在详情页借阅实体副本。"
+                copy="去藏书里选择书籍，在详情页借阅纸质书。"
               />
               <ActionButton onPress={() => navigation.navigate("Catalog")}>
                 挑一本书

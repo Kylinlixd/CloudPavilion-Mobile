@@ -179,7 +179,7 @@ export function AddBookScreen({ navigation }: Props) {
       }));
       setMessage(
         source === "local"
-          ? "已找到云阁中的书目，可直接新增副本。"
+          ? "已找到云阁中的书目，可直接新增纸质书。"
           : "已自动补全书目信息，请确认后保存。",
       );
       setMode("manual");
@@ -218,11 +218,11 @@ export function AddBookScreen({ navigation }: Props) {
                 setSubmitting(false);
                 Alert.alert(
                   "已存在藏书",
-                  `家庭中已有《${duplicate.book?.title || draft.title.trim()}》${duplicate.copy_count ? `，现有 ${duplicate.copy_count} 个实体副本` : ""}。`,
+                  `家庭中已有《${duplicate.book?.title || draft.title.trim()}》${duplicate.copy_count ? `，现有 ${duplicate.copy_count} 本纸质书` : ""}。`,
                   [
                     { text: "取消", style: "cancel" },
                     {
-                      text: "仍要添加副本",
+                      text: "仍要添加纸质书",
                       onPress: () => void guardedSave(true),
                     },
                   ],
@@ -582,13 +582,13 @@ export function AddBookScreen({ navigation }: Props) {
             value={draft.description}
           />
           <FormField
-            label="副本条码"
+            label="藏书编号"
             onChangeText={(value) => update("barcode", value)}
             placeholder="家庭自定义编号（可不填）"
             value={draft.barcode}
           />
           <FormField
-            label="副本备注"
+            label="纸质书备注"
             multiline
             onChangeText={(value) => update("notes", value)}
             placeholder="例如：客厅书架第二层"
