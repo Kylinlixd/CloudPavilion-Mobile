@@ -68,3 +68,15 @@
 - [ ] **Step 2: 构建 iOS Release**：在 `/Users/leexd/CloudPavilion-Mobile` 执行 `cd ios && pod install --silent && cd .. && xcodebuild -workspace ios/app.xcworkspace -scheme app -configuration Release -destination 'id=00008130-0002345A02E2001C' -allowProvisioningUpdates DEVELOPMENT_TEAM=M7U9C9L2DF CODE_SIGN_STYLE=Automatic build`。
 - [ ] **Step 3: 安装并启动真机**：使用 `xcrun devicectl device install app --device 00008130-0002345A02E2001C <Release app path>` 和 `xcrun devicectl device process launch --device 00008130-0002345A02E2001C com.kylinlixd.cloudpavilion`，确认详情页横向信息头和简介显示。
 - [ ] **Step 4: 部署后端并健康检查**：打包上传 `/opt/cloudpavilion`，执行 `docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build`，请求 `/cloudpavilion/health/ready/` 返回 database/redis 均为 ok。
+
+### Task 6: 详情页杂志式视觉重排
+
+**Files:**
+- Modify: `/Users/leexd/CloudPavilion-Mobile/src/screens/BookDetailScreen.tsx`
+- Modify: `/Users/leexd/CloudPavilion-Mobile/src/components/BookCover.tsx`（仅在需要统一封面尺寸时）
+
+- [ ] **Step 1: 写失败断言**：在 `src/test/book-detail.test.ts` 增加信息区节奏常量和窄屏封面尺寸断言，确保封面宽度低于旧版且信息区采用统一间距。
+- [ ] **Step 2: 运行测试确认失败**：`npm test -- --run src/test/book-detail.test.ts`。
+- [ ] **Step 3: 实现视觉重排**：详情头使用浅色信息区容器；返回按钮与头部增加垂直留白；封面宽度采用 120–136（手机）/210–230（iPad）；右侧只展示分类、标题、作者，出版社/日期/ISBN 收纳到低对比度细节行；简介标题前加入分隔线并使用 16px 正文行距。
+- [ ] **Step 4: 运行静态检查与测试**：`npm run typecheck && npm run lint && npm test -- --run`。
+- [ ] **Step 5: 提交**：`git add src/screens/BookDetailScreen.tsx src/components/BookCover.tsx src/test/book-detail.test.ts && git commit -m "style: refine book detail visual hierarchy"`。
