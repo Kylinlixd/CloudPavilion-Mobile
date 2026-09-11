@@ -170,7 +170,7 @@ export function BookDetailScreen({ route, navigation }: Props) {
               fontSize: 10,
             }}
           >
-            {book.category || "家庭藏书"}
+            {book.category || "书阁藏书"}
           </Text>
           <Text
             style={{

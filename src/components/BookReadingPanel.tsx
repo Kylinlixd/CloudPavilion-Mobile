@@ -94,9 +94,9 @@ export function BookReadingPanel({
       setPhoto(null);
       try {
         await load();
-        setMessage("已分享到家庭书房。");
+        setMessage("已分享到书阁。");
       } catch (e) {
-        setMessage(`已分享到家庭书房，但列表刷新失败：${errorMessage(e)}`);
+        setMessage(`已分享到书阁，但列表刷新失败：${errorMessage(e)}`);
       }
     } catch (e) {
       setMessage(errorMessage(e));
@@ -191,7 +191,7 @@ export function BookReadingPanel({
         loading={publishing}
         onPress={() => void publish()}
       >
-        {publishing ? "正在分享……" : "分享到家庭"}
+        {publishing ? "正在分享……" : "分享到书阁"}
       </ActionButton>
       {!!message && (
         <Text accessibilityRole="alert" style={{ color: colors.terracotta }}>

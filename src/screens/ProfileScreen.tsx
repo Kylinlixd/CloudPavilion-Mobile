@@ -230,7 +230,7 @@ export function ProfileScreen() {
           </Text>
           <View style={{ gap: spacing.sm, marginTop: spacing.md }}>
             <ActionButton onPress={() => navigation.navigate("Settings")}>
-              管理家庭与账号
+              管理书阁与账号
             </ActionButton>
             <ActionButton onPress={() => navigation.navigate("Reports")} quiet>
               查看阅读报告

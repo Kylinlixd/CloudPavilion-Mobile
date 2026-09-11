@@ -14,7 +14,6 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { ActionButton } from "../components/ActionButton";
 import { useAuth } from "../context/AuthContext";
-import { useFamily } from "../context/FamilyContext";
 import { ApiError } from "../lib/api";
 import type { RootStackParamList } from "../navigation/types";
 import { colors } from "../theme/colors";
@@ -61,10 +60,8 @@ export function LoginScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Login">>();
   const { login } = useAuth();
-  const { setCurrentFamilyId } = useFamily();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [familyId, setFamilyId] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
@@ -73,7 +70,6 @@ export function LoginScreen() {
     setPending(true);
     try {
       await login(username, password);
-      if (familyId.trim()) await setCurrentFamilyId(familyId);
     } catch (caught) {
       setError(loginErrorMessage(caught));
     } finally {
@@ -154,7 +150,7 @@ export function LoginScreen() {
               letterSpacing: -1,
             }}
           >
-            进入你的家庭书房
+            进入你的书阁
           </Text>
           <Text
             style={{
@@ -183,13 +179,6 @@ export function LoginScreen() {
               placeholder="密码"
               placeholderTextColor={colors.muted}
               secureTextEntry
-              style={inputStyle}
-            />
-            <TextInput
-              keyboardType="number-pad"
-              onChangeText={setFamilyId}
-              placeholder="家庭 ID（可稍后填写）"
-              placeholderTextColor={colors.muted}
               style={inputStyle}
             />
             {error ? (

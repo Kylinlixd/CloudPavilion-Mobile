@@ -85,7 +85,7 @@ export function HomeScreen() {
             fontSize: 32,
           }}
         >
-          先选择一个家庭。
+          先选择一个书阁。
         </Text>
         <Text
           style={{
@@ -96,7 +96,7 @@ export function HomeScreen() {
             marginTop: 12,
           }}
         >
-          去设置里输入家庭 ID，云阁才能加载你们的藏书。
+          去设置里创建或加入书阁，云阁才能加载你们的藏书。
         </Text>
         <ActionButton onPress={() => navigation.navigate("Settings")}>
           打开设置
@@ -120,7 +120,7 @@ export function HomeScreen() {
       <AppHeader
         avatar={user?.avatar}
         onPress={() => navigation.navigate("Settings")}
-        subtitle={family?.name || `家庭 ${familyId}`}
+        subtitle={family?.name || `书阁 ${familyId}`}
         title={user ? `你好，${user.nickname || user.username}。` : "你好。"}
       />
       <DailyQuoteCard />

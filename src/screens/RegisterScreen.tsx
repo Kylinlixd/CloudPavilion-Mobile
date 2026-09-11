@@ -68,8 +68,8 @@ export function RegisterScreen() {
       <View style={{ backgroundColor: colors.ink, borderRadius: 22, padding: spacing.xl }}>
         <Image accessibilityLabel="云阁 Logo" resizeMode="contain" source={require('../../assets/cloudpavilion-logo.png')} style={{ borderRadius: 18, height: 88, width: 88 }} />
         <Text style={{ color: colors.terracottaLight, fontFamily: typography.mono, fontSize: 11, letterSpacing: 1.2, marginTop: 18, textTransform: 'uppercase' }}>CloudPavilion · New Reader</Text>
-        <Text style={{ color: colors.white, fontFamily: typography.display, fontSize: 39, letterSpacing: -1.5, lineHeight: 43, marginTop: 24 }}>先拥有一把钥匙，再建立你的家庭书房。</Text>
-        <Text style={{ color: 'rgba(255,255,255,.62)', fontFamily: typography.body, fontSize: 14, lineHeight: 21, marginTop: 20 }}>账号只用于登录；家庭可以在进入云阁后创建或加入。</Text>
+        <Text style={{ color: colors.white, fontFamily: typography.display, fontSize: 39, letterSpacing: -1.5, lineHeight: 43, marginTop: 24 }}>先拥有一把钥匙，再建立你的书阁。</Text>
+        <Text style={{ color: 'rgba(255,255,255,.62)', fontFamily: typography.body, fontSize: 14, lineHeight: 21, marginTop: 20 }}>账号只用于登录；书阁可以在进入云阁后创建或加入。</Text>
       </View>
       <View style={{ paddingTop: spacing.xxl }}>
         <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 30, letterSpacing: -1 }}>创建账号</Text>

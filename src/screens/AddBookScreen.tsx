@@ -218,7 +218,7 @@ export function AddBookScreen({ navigation }: Props) {
                 setSubmitting(false);
                 Alert.alert(
                   "已存在藏书",
-                  `家庭中已有《${duplicate.book?.title || draft.title.trim()}》${duplicate.copy_count ? `，现有 ${duplicate.copy_count} 本纸质书` : ""}。`,
+                  `书阁中已有《${duplicate.book?.title || draft.title.trim()}》${duplicate.copy_count ? `，现有 ${duplicate.copy_count} 本纸质书` : ""}。`,
                   [
                     { text: "取消", style: "cancel" },
                     {
@@ -263,7 +263,7 @@ export function AddBookScreen({ navigation }: Props) {
             fontSize: 32,
           }}
         >
-          先选择一个家庭。
+          先选择一个书阁。
         </Text>
         <Text
           style={{
@@ -274,7 +274,7 @@ export function AddBookScreen({ navigation }: Props) {
             marginTop: 12,
           }}
         >
-          书籍需要放进一个家庭书房，设置完成后再回来添加。
+          书籍需要放进一个书阁，设置完成后再回来添加。
         </Text>
         <View style={{ marginTop: spacing.xl }}>
           <ActionButton onPress={() => navigation.navigate("Settings")}>
@@ -584,7 +584,7 @@ export function AddBookScreen({ navigation }: Props) {
           <FormField
             label="藏书编号"
             onChangeText={(value) => update("barcode", value)}
-            placeholder="家庭自定义编号（可不填）"
+            placeholder="书阁自定义编号（可不填）"
             value={draft.barcode}
           />
           <FormField
@@ -599,7 +599,7 @@ export function AddBookScreen({ navigation }: Props) {
               disabled={submitting}
               onPress={() => void guardedSave()}
             >
-              保存到家庭书房
+              保存到书阁
             </ActionButton>
           </View>
           <ActionButton
