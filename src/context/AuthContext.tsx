@@ -65,12 +65,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
   const logout = useCallback(async () => {
-    try {
-      await logoutAccount();
-    } finally {
-      await clearSession();
-      setSessionState({ access: null, refresh: null });
-    }
+    await logoutAccount().catch(() => undefined);
+    await clearSession();
+    setSessionState({ access: null, refresh: null });
   }, []);
   const value = useMemo(
     () => ({

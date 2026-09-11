@@ -12,13 +12,16 @@ export type Family = {
   name: string;
   description: string;
   member_count: number;
+  public_code: string;
+  allow_code_join: boolean;
+  my_role?: "owner" | "admin" | "member" | "reader" | "viewer" | null;
 };
 export type Membership = {
   id: Id;
   family: Id;
   user: Id;
   user_detail: User;
-  role: "owner" | "admin" | "member" | "viewer";
+  role: "owner" | "admin" | "member" | "reader" | "viewer";
   is_active: boolean;
   joined_at: string;
 };

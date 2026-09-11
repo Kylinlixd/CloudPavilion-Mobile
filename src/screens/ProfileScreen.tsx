@@ -82,11 +82,7 @@ export function ProfileScreen() {
       }
       style={{ backgroundColor: colors.paper }}
     >
-      <AppHeader
-        avatar={user?.avatar}
-        subtitle={family?.name || "还没有选择家庭"}
-        title="我的"
-      />
+      <AppHeader avatar={user?.avatar} subtitle={family?.name || "还没有加入书阁"} title="我的" />
       {error ? (
         <ErrorState
           message={error}
@@ -99,43 +95,25 @@ export function ProfileScreen() {
         <>
           <View
             style={{
+              alignItems: "center",
               backgroundColor: colors.ink,
               borderRadius: 16,
+              flexDirection: "row",
               padding: spacing.xl,
             }}
           >
-            <UserAvatar avatar={user?.avatar} size={52} />
-            <Text
-              style={{
-                color: colors.terracottaLight,
-                fontFamily: typography.mono,
-                fontSize: 10,
-                letterSpacing: 1,
-              }}
-            >
-              当前账号
-            </Text>
-            <Text
-              style={{
-                color: colors.white,
-                fontFamily: typography.display,
-                fontSize: 28,
-                marginTop: 18,
-              }}
-            >
-              {user?.nickname || user?.username || "云阁读者"}
-            </Text>
-            <Text
-              style={{
-                color: "rgba(255,255,255,.62)",
-                fontFamily: typography.body,
-                fontSize: 12,
-                marginTop: 6,
-              }}
-            >
-              {user?.email || "欢迎回到你的家庭书房"}
-            </Text>
+            <UserAvatar avatar={user?.avatar} size={64} />
+            <TouchableOpacity onPress={() => navigation.navigate("EditProfile")} style={{ flex: 1, marginLeft: spacing.lg }}>
+              <Text style={{ color: colors.terracottaLight, fontFamily: typography.mono, fontSize: 10, letterSpacing: 1 }}>个人资料</Text>
+              <Text numberOfLines={2} style={{ color: colors.white, fontFamily: typography.display, fontSize: 24, marginTop: 10 }}>{user?.nickname || user?.username || "云阁读者"}</Text>
+              <Text style={{ color: "rgba(255,255,255,.62)", fontFamily: typography.body, fontSize: 12, marginTop: 5 }}>编辑个人资料  ›</Text>
+            </TouchableOpacity>
           </View>
+          <TouchableOpacity onPress={() => navigation.navigate("MyLibraries")} style={{ backgroundColor: colors.paperBright, borderRadius: 14, marginTop: spacing.md, padding: spacing.lg }}>
+            <Text style={{ color: colors.terracotta, fontFamily: typography.mono, fontSize: 10, letterSpacing: 1 }}>当前书阁</Text>
+            <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 22, marginTop: 9 }}>{family?.name || "还没有加入书阁"}</Text>
+            <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 12, marginTop: 5 }}>{family ? `身份：${family.my_role === "owner" ? "阁主" : family.my_role === "reader" ? "书友" : "成员"} · 切换书阁 ›` : "创建或加入书阁 ›"}</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("Notifications")}
             style={{
@@ -248,7 +226,7 @@ export function ProfileScreen() {
               marginTop: spacing.xxl,
             }}
           >
-            家庭与设置
+            书阁与设置
           </Text>
           <View style={{ gap: spacing.sm, marginTop: spacing.md }}>
             <ActionButton onPress={() => navigation.navigate("Settings")}>
@@ -260,8 +238,8 @@ export function ProfileScreen() {
           </View>
           {!familyId && (
             <EmptyState
-              title="还没有选择家庭"
-              copy="进入设置创建或加入一个家庭，开始管理藏书。"
+              title="还没有加入书阁"
+              copy="创建或加入一个书阁，开始管理藏书。"
             />
           )}
         </>
