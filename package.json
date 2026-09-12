@@ -9,7 +9,8 @@
     "ios": "expo run:ios",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "ios:release:check": "bash scripts/ios-release-check.sh"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
