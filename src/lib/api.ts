@@ -6,6 +6,15 @@ import {
   setAccessToken,
   setSession,
 } from "./storage";
+import {
+  currentAccountKey,
+  enqueueMutation,
+  flushOutbox,
+  readCache,
+  writeCache,
+  type CacheScope,
+  type QueuedMutation,
+} from "./offlineStore";
 
 const defaultApiBaseUrl =
   typeof __DEV__ !== "undefined" && __DEV__
@@ -115,10 +124,15 @@ async function request<T>(
   if (access) headers.set("Authorization", `Bearer ${access}`);
   if (familyId) headers.set("X-Family-ID", familyId);
 
-  const response = await fetch(
-    /^https?:\/\//.test(path) ? path : `${API_BASE_URL}${path}`,
-    { ...options, headers },
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      /^https?:\/\//.test(path) ? path : `${API_BASE_URL}${path}`,
+      { ...options, headers },
+    );
+  } catch {
+    throw new ApiError(0, "网络连接失败，请稍后重试。", null);
+  }
   if (
     response.status === 401 &&
     allowRefresh &&
@@ -136,6 +150,77 @@ async function request<T>(
   return payload as T;
 }
 
+let offlineFlushPromise: Promise<{ succeeded: number; blocked: number }> | null = null;
+
+async function flushOfflineQueueInternal() {
+  const [accountKey, familyId] = await Promise.all([
+    currentAccountKey(),
+    getFamilyId(),
+  ]);
+  if (accountKey === "anonymous") return { succeeded: 0, blocked: 0 };
+  return flushOutbox(accountKey, familyId, async (item: QueuedMutation) => {
+    await request(item.path, {
+      method: item.method,
+      headers: { "Idempotency-Key": item.idempotencyKey },
+      body: item.body === undefined ? undefined : JSON.stringify(item.body),
+    }, false);
+  });
+}
+
+/** Flushes at most one queue at a time so app resume and network recovery cannot duplicate writes. */
+export function flushOfflineQueue() {
+  if (!offlineFlushPromise) {
+    offlineFlushPromise = flushOfflineQueueInternal().finally(() => {
+      offlineFlushPromise = null;
+    });
+  }
+  return offlineFlushPromise;
+}
+
+export async function getWithOfflineCache<T>(path: string, scope: CacheScope) {
+  const [accountKey, familyId] = await Promise.all([
+    currentAccountKey(),
+    getFamilyId(),
+  ]);
+  try {
+    const data = await request<T>(path);
+    await writeCache(accountKey, scope, data, familyId);
+    void flushOfflineQueue();
+    return { data, offline: false };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 0) {
+      const cached = await readCache<T>(accountKey, scope, familyId);
+      if (cached) return { data: cached.data, offline: true };
+    }
+    throw error;
+  }
+}
+
+export async function mutateWithOfflineQueue<T>(options: {
+  path: string;
+  method: "POST" | "PATCH" | "DELETE";
+  body?: unknown;
+  idempotencyKey: string;
+}) {
+  const [accountKey, familyId] = await Promise.all([
+    currentAccountKey(),
+    getFamilyId(),
+  ]);
+  try {
+    return { data: await request<T>(options.path, {
+      method: options.method,
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    }), queued: false };
+  } catch (error) {
+    if (!(error instanceof ApiError && error.status === 0)) throw error;
+    const queued = await enqueueMutation(accountKey, {
+      ...options,
+      familyId,
+    });
+    return { queued: true, queuedMutation: queued };
+  }
+}
+
 export const apiClient = {
   upload: <T>(path: string, body: FormData) =>
     request<T>(path, { method: "POST", body }),
@@ -148,4 +233,7 @@ export const apiClient = {
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  getWithOfflineCache,
+  mutateWithOfflineQueue,
+  flushOfflineQueue,
 };

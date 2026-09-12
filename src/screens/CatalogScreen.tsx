@@ -62,6 +62,7 @@ export function CatalogScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [offline, setOffline] = useState(false);
 
   const requestPath = useCallback(() => {
     const params = new URLSearchParams({ ordering });
@@ -70,7 +71,12 @@ export function CatalogScreen() {
   }, [ordering, query]);
   const load = useCallback(async () => {
     if (!familyId) return;
-    const page = pageOf(await apiClient.get<Book[] | BookPage>(requestPath()));
+    const result = await apiClient.getWithOfflineCache<Book[] | BookPage>(
+      requestPath(),
+      "books",
+    );
+    const page = pageOf(result.data);
+    setOffline(result.offline);
     setBooks(page.items);
     setNextPage(page.next);
     setTotalBookCount(page.count);
@@ -222,6 +228,14 @@ export function CatalogScreen() {
               </TouchableOpacity>
             </View>
           </View>
+          {offline ? (
+            <Text
+              accessibilityRole="alert"
+              style={{ color: colors.terracotta, fontSize: 12, marginTop: spacing.sm }}
+            >
+              当前离线，显示上次同步的藏书
+            </Text>
+          ) : null}
         </View>
       )}
       {!selecting && (

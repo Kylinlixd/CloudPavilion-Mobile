@@ -74,4 +74,21 @@ describe("native app shell", () => {
     expect(loansSource).toContain("pendingActions.has(`${item.id}:renew`)");
     expect(loansSource).toContain("pendingActions.has(`${item.id}:return`)");
   });
+
+  it("integrates account-scoped offline fallback into shelf and profile flows", () => {
+    const catalogSource = readFileSync(
+      resolve(projectRoot, "src/screens/CatalogScreen.tsx"),
+      "utf8",
+    );
+    const profileSource = readFileSync(
+      resolve(projectRoot, "src/screens/EditProfileScreen.tsx"),
+      "utf8",
+    );
+
+    expect(catalogSource).toContain("getWithOfflineCache");
+    expect(catalogSource).toContain("当前离线，显示上次同步的藏书");
+    expect(profileSource).toContain("getWithOfflineCache");
+    expect(profileSource).toContain("mutateWithOfflineQueue");
+    expect(profileSource).toContain("联网后自动同步");
+  });
 });
