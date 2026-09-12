@@ -114,10 +114,10 @@ export function ProfileScreen() {
               <Text style={{ color: "rgba(255,255,255,.62)", fontFamily: typography.body, fontSize: 12, marginTop: spacing.xs }}>编辑个人资料  ›</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate("MyLibraries")} style={{ backgroundColor: colors.paperBright, borderRadius: 14, marginTop: spacing.md, padding: spacing.lg }}>
+          <TouchableOpacity onPress={() => navigation.navigate("Settings")} style={{ backgroundColor: colors.paperBright, borderRadius: 14, marginTop: spacing.md, padding: spacing.lg }}>
             <Text style={{ color: colors.terracotta, fontFamily: typography.mono, fontSize: 10, letterSpacing: 1 }}>当前书阁</Text>
             <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 22, marginTop: spacing.sm }}>{family?.name || "还没有加入书阁"}</Text>
-            <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 12, marginTop: spacing.xs }}>{family ? `身份：${family.my_role === "owner" ? "阁主" : family.my_role === "reader" ? "书友" : "成员"} · 切换书阁 ›` : "创建或加入书阁 ›"}</Text>
+            <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 12, marginTop: spacing.xs }}>{family ? `身份：${family.my_role === "owner" ? "阁主" : family.my_role === "reader" ? "书友" : "成员"} · 管理书阁 ›` : "创建或加入书阁 ›"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("Notifications")}
@@ -231,12 +231,9 @@ export function ProfileScreen() {
               marginTop: spacing.xxl,
             }}
           >
-            书阁与设置
+            阅读数据
           </Text>
           <View style={{ gap: spacing.sm, marginTop: spacing.md }}>
-            <ActionButton onPress={() => navigation.navigate("Settings")}>
-              管理书阁与账号
-            </ActionButton>
             <ActionButton onPress={() => navigation.navigate("Reports")} quiet>
               查看阅读报告
             </ActionButton>

@@ -91,4 +91,35 @@ describe("native app shell", () => {
     expect(profileSource).toContain("mutateWithOfflineQueue");
     expect(profileSource).toContain("联网后自动同步");
   });
+
+  it("keeps reservations in the lending tab instead of a duplicate route", () => {
+    const navigatorSource = readFileSync(
+      resolve(projectRoot, "src/navigation/RootNavigator.tsx"),
+      "utf8",
+    );
+    const typesSource = readFileSync(
+      resolve(projectRoot, "src/navigation/types.ts"),
+      "utf8",
+    );
+    const loansSource = readFileSync(
+      resolve(projectRoot, "src/screens/LoansScreen.tsx"),
+      "utf8",
+    );
+
+    expect(navigatorSource).not.toContain("ReservationsScreen");
+    expect(typesSource).not.toContain("Reservations:");
+    expect(loansSource).toContain('"reservations"');
+    expect(loansSource).toContain("我的预约");
+  });
+
+  it("keeps the profile book-pavilion card as the single management entry", () => {
+    const profileSource = readFileSync(
+      resolve(projectRoot, "src/screens/ProfileScreen.tsx"),
+      "utf8",
+    );
+    expect(profileSource).toContain('navigation.navigate("Settings")');
+    expect(profileSource).toContain("管理书阁 ›");
+    expect(profileSource).toContain("阅读数据");
+    expect(profileSource).not.toContain("管理书阁与账号");
+  });
 });

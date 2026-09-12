@@ -41,7 +41,7 @@ export function AppHeader({
               color: colors.muted,
               fontFamily: typography.body,
               fontSize: 13,
-              marginTop: 5,
+              marginTop: spacing.xs,
             }}
           >
             {subtitle}
