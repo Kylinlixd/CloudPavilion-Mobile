@@ -134,7 +134,7 @@ export function HomeScreen() {
           value={dashboard?.books.titles ?? "—"}
         />
         <MetricTile
-          label="实体"
+          label="纸质书"
           note="真实拥有"
           tone="terracotta"
           value={dashboard?.books.copies ?? "—"}

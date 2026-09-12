@@ -57,9 +57,21 @@ describe("native app shell", () => {
     expect(catalogSource).toContain("checkmark-circle-outline");
     expect(catalogSource).toContain('accessibilityLabel="导入书籍"');
     expect(catalogSource).toContain('accessibilityLabel="选择书籍"');
-    expect(catalogSource).toContain("扫码/拍照添加实体书");
+    expect(catalogSource).toContain("扫码/拍照添加纸质书");
+    expect(catalogSource).toContain('accessibilityLabel="书架统计"');
     expect(catalogSource).toContain('navigation.navigate("AddBook")');
     expect(ebookImportSource).toContain("导入电子书 · EPUB / PDF / TXT");
     expect(ebookImportSource).toContain("navigation.navigate('BookDetail'");
+  });
+
+  it("keeps lending actions independently loading", () => {
+    const loansSource = readFileSync(
+      resolve(projectRoot, "src/screens/LoansScreen.tsx"),
+      "utf8",
+    );
+
+    expect(loansSource).toContain("pendingActions");
+    expect(loansSource).toContain("pendingActions.has(`${item.id}:renew`)");
+    expect(loansSource).toContain("pendingActions.has(`${item.id}:return`)");
   });
 });

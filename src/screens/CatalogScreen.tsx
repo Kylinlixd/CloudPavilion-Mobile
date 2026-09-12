@@ -188,9 +188,10 @@ export function CatalogScreen() {
             }}
           >
             <Text
-              style={{ color: colors.ink, fontSize: 22, fontWeight: "700" }}
+              accessibilityLabel="书架统计"
+              style={{ color: colors.muted, fontSize: 12 }}
             >
-              书架
+              共 {totalBookCount} 个书名 · {totalCopyCount} 本纸质书
             </Text>
             <View style={{ flexDirection: "row", gap: spacing.lg }}>
               <TouchableOpacity
@@ -370,7 +371,6 @@ export function CatalogScreen() {
           ListFooterComponent={
             <View style={{ alignItems: "center", paddingTop: spacing.lg }}>
               <Text style={{ color: colors.muted, fontSize: 12 }}>
-                共 {totalBookCount} 个书名 · {totalCopyCount} 本纸质书
                 {loadingMore ? " · 正在加载" : ""}
               </Text>
             </View>
@@ -431,7 +431,7 @@ export function CatalogScreen() {
                 navigation.navigate("AddBook");
               }}
             >
-              扫码/拍照添加实体书
+              扫码/拍照添加纸质书
             </ActionButton>
             <View style={{ marginTop: spacing.md }}>
               <ImportEbookButton />

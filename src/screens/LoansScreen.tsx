@@ -58,7 +58,18 @@ export function LoansScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [pending, setPending] = useState<string | null>(null);
+  const [pendingActions, setPendingActions] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const markPending = useCallback((key: string, pending: boolean) => {
+    setPendingActions((current) => {
+      const next = new Set(current);
+      if (pending) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }, []);
 
   const load = useCallback(async () => {
     if (!familyId) return;
@@ -80,8 +91,8 @@ export function LoansScreen() {
 
   async function action(id: number, type: "return" | "renew") {
     const key = `${id}:${type}`;
-    if (pending) return;
-    setPending(key);
+    if (pendingActions.has(key)) return;
+    markPending(key, true);
     setError("");
     try {
       const updated = await apiClient.post<Loan>(`/loans/${id}/${type}/`);
@@ -100,14 +111,14 @@ export function LoansScreen() {
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
-      setPending(null);
+      markPending(key, false);
     }
   }
 
   async function cancelReservation(id: number) {
     const key = `${id}:cancel`;
-    if (pending) return;
-    setPending(key);
+    if (pendingActions.has(key)) return;
+    markPending(key, true);
     setError("");
     try {
       const updated = await apiClient.post<Reservation>(
@@ -126,7 +137,7 @@ export function LoansScreen() {
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
-      setPending(null);
+      markPending(key, false);
     }
   }
 
@@ -296,8 +307,8 @@ export function LoansScreen() {
                   </Text>
                   {item.status === "pending" && (
                     <ActionButton
-                      disabled={Boolean(pending)}
-                      loading={pending === `${item.id}:cancel`}
+                      disabled={pendingActions.has(`${item.id}:cancel`)}
+                      loading={pendingActions.has(`${item.id}:cancel`)}
                       onPress={() => void cancelReservation(item.id)}
                       quiet
                     >
@@ -375,16 +386,16 @@ export function LoansScreen() {
                     }}
                   >
                     <ActionButton
-                      disabled={Boolean(pending)}
-                      loading={pending === `${item.id}:renew`}
+                      disabled={pendingActions.has(`${item.id}:renew`)}
+                      loading={pendingActions.has(`${item.id}:renew`)}
                       onPress={() => void action(item.id, "renew")}
                       quiet
                     >
                       续借
                     </ActionButton>
                     <ActionButton
-                      disabled={Boolean(pending)}
-                      loading={pending === `${item.id}:return`}
+                      disabled={pendingActions.has(`${item.id}:return`)}
+                      loading={pendingActions.has(`${item.id}:return`)}
                       onPress={() => void action(item.id, "return")}
                     >
                       归还
