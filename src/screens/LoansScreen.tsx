@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ActionButton } from "../components/ActionButton";
 import { AppHeader } from "../components/AppHeader";
@@ -52,6 +53,7 @@ const reservationLabels: Record<string, string> = {
 export function LoansScreen() {
   const navigation = useNavigation<any>();
   const { familyId } = useFamily();
+  const insets = useSafeAreaInsets();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [filter, setFilter] = useState<Filter>("active");
@@ -204,7 +206,10 @@ export function LoansScreen() {
         />
       ) : (
         <FlatList<any>
-          contentContainerStyle={{ gap: spacing.sm, paddingBottom: 120 }}
+          contentContainerStyle={{
+            gap: spacing.md,
+            paddingBottom: spacing.bottomNav + insets.bottom + spacing.lg,
+          }}
           data={data}
           keyExtractor={(item) => String(item.id)}
           refreshControl={
@@ -292,13 +297,13 @@ export function LoansScreen() {
                     </Text>
                   </View>
                   <Text
-                    style={{ color: colors.muted, fontSize: 12, marginTop: 5 }}
+                    style={{ color: colors.muted, fontSize: 12, marginTop: spacing.xs }}
                   >
                     {item.author || "作者未录入"} ·{" "}
                     {item.barcode || `藏书编号 ${item.copy}`}
                   </Text>
                   <Text
-                    style={{ color: colors.muted, fontSize: 12, marginTop: 5 }}
+                    style={{ color: colors.muted, fontSize: 12, marginTop: spacing.xs }}
                   >
                     {item.queue_position == null
                       ? "队列位置未知"
@@ -362,7 +367,7 @@ export function LoansScreen() {
                     color: colors.muted,
                     fontFamily: typography.body,
                     fontSize: 12,
-                    marginTop: 10,
+                    marginTop: spacing.sm,
                   }}
                 >
                   {item.borrower_name} ·{" "}
@@ -372,7 +377,7 @@ export function LoansScreen() {
                 </Text>
                 {item.action_reason ? (
                   <Text
-                    style={{ color: colors.muted, fontSize: 11, marginTop: 5 }}
+                    style={{ color: colors.muted, fontSize: 11, marginTop: spacing.xs }}
                   >
                     {item.action_reason}
                   </Text>

@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ActionButton } from "../components/ActionButton";
 import { AppHeader } from "../components/AppHeader";
@@ -28,6 +29,7 @@ function list<T>(value: T[] | { results: T[] }) {
 export function ProfileScreen() {
   const navigation = useNavigation<any>();
   const { familyId, family } = useFamily();
+  const insets = useSafeAreaInsets();
   const [user, setUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
@@ -69,7 +71,10 @@ export function ProfileScreen() {
   const unread = notifications.filter((item) => !item.is_read).length;
   return (
     <ScrollView
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: 120 }}
+      contentContainerStyle={{
+        padding: spacing.lg,
+        paddingBottom: spacing.bottomNav + insets.bottom + spacing.lg,
+      }}
       refreshControl={
         <RefreshControl
           colors={[colors.terracotta]}
@@ -105,14 +110,14 @@ export function ProfileScreen() {
             <UserAvatar avatar={user?.avatar} size={64} />
             <TouchableOpacity onPress={() => navigation.navigate("EditProfile")} style={{ flex: 1, marginLeft: spacing.lg }}>
               <Text style={{ color: colors.terracottaLight, fontFamily: typography.mono, fontSize: 10, letterSpacing: 1 }}>个人资料</Text>
-              <Text numberOfLines={2} style={{ color: colors.white, fontFamily: typography.display, fontSize: 24, marginTop: 10 }}>{user?.nickname || user?.username || "云阁读者"}</Text>
-              <Text style={{ color: "rgba(255,255,255,.62)", fontFamily: typography.body, fontSize: 12, marginTop: 5 }}>编辑个人资料  ›</Text>
+              <Text numberOfLines={2} style={{ color: colors.white, fontFamily: typography.display, fontSize: 24, marginTop: spacing.sm }}>{user?.nickname || user?.username || "云阁读者"}</Text>
+              <Text style={{ color: "rgba(255,255,255,.62)", fontFamily: typography.body, fontSize: 12, marginTop: spacing.xs }}>编辑个人资料  ›</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate("MyLibraries")} style={{ backgroundColor: colors.paperBright, borderRadius: 14, marginTop: spacing.md, padding: spacing.lg }}>
             <Text style={{ color: colors.terracotta, fontFamily: typography.mono, fontSize: 10, letterSpacing: 1 }}>当前书阁</Text>
-            <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 22, marginTop: 9 }}>{family?.name || "还没有加入书阁"}</Text>
-            <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 12, marginTop: 5 }}>{family ? `身份：${family.my_role === "owner" ? "阁主" : family.my_role === "reader" ? "书友" : "成员"} · 切换书阁 ›` : "创建或加入书阁 ›"}</Text>
+            <Text style={{ color: colors.ink, fontFamily: typography.display, fontSize: 22, marginTop: spacing.sm }}>{family?.name || "还没有加入书阁"}</Text>
+            <Text style={{ color: colors.muted, fontFamily: typography.body, fontSize: 12, marginTop: spacing.xs }}>{family ? `身份：${family.my_role === "owner" ? "阁主" : family.my_role === "reader" ? "书友" : "成员"} · 切换书阁 ›` : "创建或加入书阁 ›"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("Notifications")}
@@ -138,7 +143,7 @@ export function ProfileScreen() {
                 color: colors.ink,
                 fontFamily: typography.display,
                 fontSize: 23,
-                marginTop: 12,
+                marginTop: spacing.sm,
               }}
             >
               {unread ? `${unread} 条未读消息` : "没有未读消息"}
@@ -148,7 +153,7 @@ export function ProfileScreen() {
                 color: colors.muted,
                 fontFamily: typography.body,
                 fontSize: 12,
-                marginTop: 6,
+                marginTop: spacing.xs,
               }}
             >
               {notifications[0]?.title || "借阅到期和预约变化会在这里提醒你"} →
@@ -183,7 +188,7 @@ export function ProfileScreen() {
                   color: colors.white,
                   fontFamily: typography.display,
                   fontSize: 32,
-                  marginTop: 12,
+                  marginTop: spacing.sm,
                 }}
               >
                 {dashboard?.books.titles ?? "—"}
@@ -211,7 +216,7 @@ export function ProfileScreen() {
                   color: colors.white,
                   fontFamily: typography.display,
                   fontSize: 32,
-                  marginTop: 12,
+                  marginTop: spacing.sm,
                 }}
               >
                 {report?.total_loans ?? "—"}

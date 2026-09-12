@@ -204,7 +204,7 @@ export function CatalogScreen() {
                 accessibilityLabel="导入书籍"
                 accessibilityRole="button"
                 onPress={() => setImportOpen(true)}
-                style={{ alignItems: "center", flexDirection: "row", gap: 5 }}
+                style={{ alignItems: "center", flexDirection: "row", gap: spacing.xs }}
               >
                 <Ionicons
                   color={colors.terracotta}
@@ -217,7 +217,7 @@ export function CatalogScreen() {
                 accessibilityLabel="选择书籍"
                 accessibilityRole="button"
                 onPress={() => setSelecting(true)}
-                style={{ alignItems: "center", flexDirection: "row", gap: 5 }}
+                style={{ alignItems: "center", flexDirection: "row", gap: spacing.xs }}
               >
                 <Ionicons
                   color={colors.ink}
@@ -259,7 +259,7 @@ export function CatalogScreen() {
                 backgroundColor:
                   ordering === value ? colors.ink : colors.paperBright,
                 borderRadius: 8,
-                padding: 8,
+                padding: spacing.sm,
               }}
             >
               <Text
@@ -281,7 +281,9 @@ export function CatalogScreen() {
           columnWrapperStyle={{ gap: spacing.sm }}
           contentContainerStyle={{
             gap: spacing.md,
-            paddingBottom: selecting ? 180 : 120,
+            paddingBottom: selecting
+              ? spacing.bottomNav + insets.bottom + spacing.xl + spacing.lg
+              : spacing.bottomNav + insets.bottom + spacing.lg,
           }}
           data={books}
           keyExtractor={(book) => String(book.id)}
@@ -332,8 +334,8 @@ export function CatalogScreen() {
                       height: 24,
                       justifyContent: "center",
                       position: "absolute",
-                      right: 5,
-                      top: 5,
+                      right: spacing.xs,
+                      top: spacing.xs,
                       width: 24,
                     }}
                   >
@@ -352,7 +354,7 @@ export function CatalogScreen() {
               </View>
               <Text
                 numberOfLines={2}
-                style={{ color: colors.ink, fontSize: 10, marginTop: 5 }}
+                 style={{ color: colors.ink, fontSize: 10, marginTop: spacing.xs }}
               >
                 {item.title}
               </Text>
